@@ -45,9 +45,7 @@ export default function Navbar() {
           <span className="brand-text">JeevanCare<sup>+</sup></span>
         </Link>
 
-        <div className="navbar-search-wrapper">
-          <SearchBar />
-        </div>
+
 
         <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu">
           <span className={`hamburger ${menuOpen ? 'open' : ''}`}></span>

@@ -16,8 +16,37 @@ exports.getHospitals = async (req, res) => {
       params.push(city);
     }
     if (search) {
-      query += ' AND (name LIKE ? OR address LIKE ?)';
-      params.push(`%${search}%`, `%${search}%`);
+      const searchLower = search.toLowerCase().trim();
+      
+      const diseaseMapping = {
+        'Cardiology': ['heart', 'cardiac', 'chest pain', 'bp', 'blood pressure', 'angina', 'stroke', 'cardio'],
+        'Neurology': ['brain', 'stroke', 'neuro', 'headache', 'migraine', 'seizure', 'paralysis', 'nerve'],
+        'Orthopedics': ['fracture', 'bone', 'joint', 'arthritis', 'ortho', 'knee pain', 'back pain', 'spine', 'sprain'],
+        'Oncology': ['cancer', 'tumor', 'chemo', 'oncology', 'leukemia', 'lymphoma'],
+        'Pediatrics': ['child', 'kids', 'baby', 'pediatrician', 'infant', 'childhood', 'pedia'],
+        'Gastroenterology': ['stomach', 'liver', 'acid reflux', 'acidity', 'digestion', 'gut', 'ulcer', 'piles', 'gastro'],
+        'Pulmonology': ['asthma', 'lung', 'cough', 'breathing', 'copd', 'pneumonia', 'tuberculosis'],
+        'Urology': ['kidney stone', 'urinary', 'urine', 'prostate', 'urology'],
+        'Nephrology': ['kidney', 'dialysis', 'renal', 'nephro']
+      };
+
+      const matchedSpecialties = [];
+      for (const [specialty, keywords] of Object.entries(diseaseMapping)) {
+        if (keywords.some(keyword => searchLower.includes(keyword) || keyword.includes(searchLower))) {
+          matchedSpecialties.push(specialty);
+        }
+      }
+
+      if (matchedSpecialties.length > 0) {
+        const placeholders = matchedSpecialties.map(() => '?').join(',');
+        query += ` AND (name LIKE ? OR address LIKE ? OR id IN (
+          SELECT DISTINCT hospital_id FROM hospital_doctors WHERE specialization IN (${placeholders})
+        ))`;
+        params.push(`%${search}%`, `%${search}%`, ...matchedSpecialties);
+      } else {
+        query += ' AND (name LIKE ? OR address LIKE ?)';
+        params.push(`%${search}%`, `%${search}%`);
+      }
     }
 
     query += ' ORDER BY name ASC';
