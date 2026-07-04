@@ -139,15 +139,19 @@ export default function GoogleMap({ locations, type = 'hospitals', onMarkerClick
         justifyContent: 'center',
         color: '#94A3B8',
         padding: 'var(--space-6)',
-        backgroundImage: 'radial-gradient(#334155 1.5px, transparent 1.5px)',
-        backgroundSize: '24px 24px'
+        backgroundImage: 'url("/hyderabad_map.png")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        border: '1px solid var(--color-border)',
+        borderRadius: 'var(--radius-xl)',
+        overflow: 'hidden'
       }}>
         <div style={{
           position: 'absolute',
           top: 0,
           left: 0,
           right: 0,
-          background: 'rgba(255, 255, 255, 0.9)',
+          background: 'rgba(255, 255, 255, 0.95)',
           padding: 'var(--space-3) var(--space-4)',
           borderBottom: '1px solid var(--color-border)',
           display: 'flex',
@@ -157,11 +161,11 @@ export default function GoogleMap({ locations, type = 'hospitals', onMarkerClick
           boxShadow: 'var(--shadow-sm)',
           zIndex: 1
         }}>
-          <span style={{ fontWeight: 600, fontSize: 'var(--font-size-sm)' }}>
-            🗺️ Interactive Map (Hyderabad Grid)
+          <span style={{ fontWeight: 600, fontSize: 'var(--font-size-sm)', color: '#0F172A' }}>
+            🗺️ Interactive Map (Hyderabad Vector View)
           </span>
-          <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)' }}>
-            Google Maps API Key Missing
+          <span style={{ fontSize: 'var(--font-size-xs)', color: '#DC2626', fontWeight: 600 }}>
+            API Key Restricted (Using Premium Fallback)
           </span>
         </div>
 
