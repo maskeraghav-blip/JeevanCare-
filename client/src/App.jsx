@@ -5,6 +5,7 @@ import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/common/Navbar';
 import Footer from './components/common/Footer';
 import ProtectedRoute from './components/common/ProtectedRoute';
+import AIChatAssistant from './components/common/AIChatAssistant';
 
 // Pages
 import Home from './pages/Home';
@@ -78,6 +79,7 @@ export default function App() {
             </Routes>
           </div>
           <Footer />
+          <AIChatAssistant />
         </div>
       </Router>
     </AuthProvider>
