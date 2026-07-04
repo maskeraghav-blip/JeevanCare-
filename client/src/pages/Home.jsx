@@ -65,12 +65,10 @@ export default function Home() {
           </div>
           <div className="hero-visual">
             <div className="visual-card glass-card">
-              <div className="visual-icon">💚</div>
               <h3>Fast Care Delivery</h3>
               <p>Book verified home visits in Hyderabad within minutes.</p>
             </div>
             <div className="visual-card glass-card float-2">
-              <div className="visual-icon">🩹</div>
               <h3>Home Nursing</h3>
               <p>Hire skilled nursing staff with flexible duration models.</p>
             </div>
@@ -90,7 +88,6 @@ export default function Home() {
             {modules.map((mod) => (
               <div key={mod.title} className="card service-card">
                 <span className="service-badge">{mod.badge}</span>
-                <span className="service-icon">{mod.icon}</span>
                 <h3>{mod.title}</h3>
                 <p>{mod.desc}</p>
                 <Link to={mod.path} className="btn btn-primary service-action-btn">

@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import SearchBar from './SearchBar';
 import './Navbar.css';
 
 export default function Navbar() {
@@ -23,12 +22,12 @@ export default function Navbar() {
   }, []);
 
   const navLinks = [
-    { path: '/hospitals', label: 'Hospitals', icon: '🏥' },
-    { path: '/clinic-doctors', label: 'Clinic Doctors', icon: '👨‍⚕️' },
-    { path: '/nurses', label: 'Nurses', icon: '🩺' },
-    { path: '/physiotherapy', label: 'Physiotherapy', icon: '🦴' },
-    { path: '/complaints', label: 'Feedback', icon: '📝' },
-    { path: '/consent', label: 'Consent', icon: '📋' },
+    { path: '/hospitals', label: 'Hospitals' },
+    { path: '/clinic-doctors', label: 'Clinic Doctors' },
+    { path: '/nurses', label: 'Nurses' },
+    { path: '/physiotherapy', label: 'Physiotherapy' },
+    { path: '/complaints', label: 'Feedback' },
+    { path: '/consent', label: 'Consent' },
   ];
 
   const handleLogout = () => {
@@ -58,7 +57,6 @@ export default function Navbar() {
               to={link.path}
               className={`nav-link ${location.pathname.startsWith(link.path) ? 'active' : ''}`}
             >
-              <span className="nav-icon">{link.icon}</span>
               <span className="nav-label">{link.label}</span>
             </Link>
           ))}

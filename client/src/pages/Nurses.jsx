@@ -77,7 +77,7 @@ export default function Nurses() {
         <input
           type="text"
           className="form-input"
-          placeholder="🔍 Search nurses by name or details..."
+          placeholder="Search nurses by name or details..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />

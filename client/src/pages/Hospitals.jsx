@@ -75,7 +75,7 @@ export default function Hospitals() {
         <input
           type="text"
           className="form-input"
-          placeholder="🔍 Search hospitals by name, area, or facility..."
+          placeholder="Search hospitals by name, area, or facility..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />

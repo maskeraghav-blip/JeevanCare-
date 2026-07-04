@@ -77,7 +77,7 @@ export default function ClinicDoctors() {
         <input
           type="text"
           className="form-input"
-          placeholder="🔍 Search doctors by name, clinic name, or specialty..."
+          placeholder="Search doctors by name, clinic name, or specialty..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />

@@ -79,7 +79,7 @@ export default function Physiotherapy() {
         <input
           type="text"
           className="form-input"
-          placeholder="🔍 Search physiotherapists by name or specialization..."
+          placeholder="Search physiotherapists by name or specialization..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
