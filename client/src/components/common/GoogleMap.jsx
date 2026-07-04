@@ -21,7 +21,7 @@ export default function GoogleMap({ locations, type = 'hospitals', onMarkerClick
 
     // Try to load script
     const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
-    if (!apiKey || apiKey === 'YOUR_GOOGLE_MAPS_API_KEY') {
+    if (!apiKey || apiKey === 'YOUR_GOOGLE_MAPS_API_KEY' || !apiKey.startsWith('AIzaSy')) {
       setMapError(true);
       return;
     }
