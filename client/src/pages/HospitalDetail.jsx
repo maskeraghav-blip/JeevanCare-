@@ -58,17 +58,16 @@ export default function HospitalDetail() {
             </div>
 
             <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-md)', marginBottom: 'var(--space-6)' }}>
-              📍 {hospital.address}, Hyderabad, Telangana
+              {hospital.address}, Hyderabad, Telangana
             </p>
 
             <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: 'var(--space-6)' }}>
               <h3 style={{ fontSize: 'var(--font-size-lg)', fontWeight: 700, marginBottom: 'var(--space-4)' }}>
-                🏥 Hospital Infrastructure & Facilities
+                Hospital Infrastructure & Facilities
               </h3>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 'var(--space-3)' }}>
                 {hospital.facilities?.map((f) => (
                   <div key={f} className="facility-tag" style={{ padding: 'var(--space-3)', justifyContent: 'flex-start', fontSize: 'var(--font-size-sm)' }}>
-                    <span style={{ fontSize: '1.2rem' }}>{FACILITY_ICONS[f] || '🏥'}</span>
                     <span>{f}</span>
                   </div>
                 ))}
@@ -78,7 +77,7 @@ export default function HospitalDetail() {
 
           <div>
             <h2 style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 800, marginBottom: 'var(--space-4)' }}>
-              👨‍⚕️ Available Doctors ({doctors.length})
+              Available Doctors ({doctors.length})
             </h2>
 
             {doctors.length === 0 ? (

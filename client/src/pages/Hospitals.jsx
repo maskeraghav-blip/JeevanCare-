@@ -123,15 +123,14 @@ export default function Hospitals() {
                         {h.type}
                       </span>
                     </div>
-
                     <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-3)' }}>
-                      📍 {h.address}
+                      {h.address}
                     </p>
 
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}>
                       {h.facilities?.slice(0, 4).map((f) => (
                         <span key={f} className="facility-tag">
-                          {FACILITY_ICONS[f] || '🏥'} {f}
+                          {f}
                         </span>
                       ))}
                       {h.facilities?.length > 4 && (
