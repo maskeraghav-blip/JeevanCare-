@@ -130,7 +130,7 @@ export default function GoogleMap({ locations, type = 'hospitals', onMarkerClick
   if (mapError) {
     // Beautiful Premium Interactive Map Mockup Fallback
     return (
-      <div className="map-container" style={{
+      <div key="google-map-fallback" className="map-container" style={{
         position: 'relative',
         background: '#0F172A',
         display: 'flex',
@@ -235,6 +235,6 @@ export default function GoogleMap({ locations, type = 'hospitals', onMarkerClick
   }
 
   return (
-    <div ref={mapRef} className="map-container" />
+    <div key="google-map-active" ref={mapRef} className="map-container" />
   );
 }
