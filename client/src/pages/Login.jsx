@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import './Login.css';
 
 export default function Login() {
   const { login } = useAuth();
@@ -8,6 +9,7 @@ export default function Login() {
   const location = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -28,62 +30,101 @@ export default function Login() {
   };
 
   return (
-    <div className="container page-wrapper" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <div className="glass-card" style={{ maxWidth: '420px', width: '100%', padding: 'var(--space-8)' }}>
-        <h2 style={{ textAlign: 'center', marginBottom: 'var(--space-2)', fontSize: 'var(--font-size-2xl)', fontWeight: 800 }}>Welcome Back</h2>
-        <p style={{ textAlign: 'center', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-6)', fontSize: 'var(--font-size-sm)' }}>
-          Log in to manage appointments & consent forms
-        </p>
+    <div className="login-page-container">
+      {/* Left Column: Image Background & Branding */}
+      <div className="login-left-side">
+        <div className="login-brand-logo">
+          <div className="login-brand-circle">J</div>
+          <span className="login-brand-text">jeevanCare<sup>+</sup></span>
+        </div>
 
-        {error && (
-          <div style={{
-            background: 'var(--color-accent-red-light)',
-            color: 'var(--color-accent-red)',
-            padding: 'var(--space-3)',
-            borderRadius: 'var(--radius-md)',
-            marginBottom: 'var(--space-4)',
-            fontSize: 'var(--font-size-sm)',
-            fontWeight: 500
-          }}>
-            ⚠️ {error}
-          </div>
-        )}
+        <div className="login-left-content">
+          <span className="login-tagline">HYPER-LOCAL HEALTHCARE</span>
+          <h1 className="login-heading">
+            Care that <span>comes to you</span>, not the other way around.
+          </h1>
+          <p className="login-description">
+            Discover hospitals, book verified home-visit doctors, and track their arrival — all in one calm, uncluttered place.
+          </p>
+        </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label className="form-label" htmlFor="email">Email Address</label>
-            <input
-              type="email"
-              id="email"
-              className="form-input"
-              placeholder="name@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
+        <div className="login-cities">
+          Serving Mumbai · Delhi · Bangalore · Hyderabad · Chennai · Kolkata · Pune · Ahmedabad
+        </div>
+      </div>
 
-          <div className="form-group" style={{ marginBottom: 'var(--space-6)' }}>
-            <label className="form-label" htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              className="form-input"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
+      {/* Right Column: Clean Login Form */}
+      <div className="login-right-side">
+        <div className="login-form-box">
+          <span className="login-welcome-tag">WELCOME BACK</span>
+          <h2 className="login-title-h2">Sign in to continue</h2>
+          <p className="login-sub-hint">
+            Use <code>admin@jeevancare.com</code> / <code>Admin@123</code> to explore.
+          </p>
 
-          <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: 'var(--space-3)' }} disabled={submitting}>
-            {submitting ? 'Signing in...' : 'Sign In'}
-          </button>
-        </form>
+          {error && (
+            <div style={{
+              background: '#FEE2E2',
+              color: '#991B1B',
+              padding: '12px 16px',
+              borderRadius: '8px',
+              marginBottom: '20px',
+              fontSize: '0.85rem',
+              fontWeight: 500,
+              border: '1px solid #FCA5A5'
+            }}>
+              ⚠️ {error}
+            </div>
+          )}
 
-        <p style={{ textAlign: 'center', marginTop: 'var(--space-6)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
-          Don't have an account? <Link to="/signup" style={{ fontWeight: 600, color: 'var(--color-primary)' }}>Sign Up</Link>
-        </p>
+          <form onSubmit={handleSubmit}>
+            <div className="login-field-group">
+              <label className="login-input-label" htmlFor="email">EMAIL</label>
+              <div className="login-input-wrapper">
+                <input
+                  type="email"
+                  id="email"
+                  className="login-input-field"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="login-field-group" style={{ marginBottom: '24px' }}>
+              <label className="login-input-label" htmlFor="password">PASSWORD</label>
+              <div className="login-input-wrapper">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="password"
+                  className="login-input-field"
+                  placeholder="........"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <button
+                  type="button"
+                  className="login-input-icon-btn"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? '👁️' : '👁️‍🗨️'}
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" className="login-submit-btn" disabled={submitting}>
+              {submitting ? 'Signing in...' : 'Sign in'}
+            </button>
+          </form>
+
+          <p className="login-footer-text">
+            New to jeevanCare+? <Link to="/signup" className="login-signup-link">Create an account</Link>
+          </p>
+        </div>
       </div>
     </div>
   );
