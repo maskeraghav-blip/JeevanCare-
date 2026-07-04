@@ -14,9 +14,6 @@ exports.getHospitals = async (req, res) => {
     if (city) {
       query += ' AND city = ?';
       params.push(city);
-    } else {
-      query += ' AND city = ?';
-      params.push('Hyderabad');
     }
     if (search) {
       query += ' AND (name LIKE ? OR address LIKE ?)';

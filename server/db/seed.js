@@ -906,6 +906,49 @@ async function seed() {
   }
   console.log(`   Inserted ${doctorCount} specialty doctors\n`);
 
+  // ---- 5b. GENERATE DOCTORS FOR ALL REMAINING HOSPITALS ----
+  console.log('👨‍⚕️ Generating and mapping doctors to all seeded hospitals...');
+  const firstNames = ['Amit', 'Rajesh', 'Sanjay', 'Sunil', 'Vijay', 'Anil', 'Ramesh', 'Suresh', 'Karan', 'Arjun', 'Priya', 'Anjali', 'Kavitha', 'Shalini', 'Pooja', 'Deepak', 'Vikram', 'Aditya', 'Rahul', 'Neha'];
+  const lastNames = ['Sharma', 'Verma', 'Gupta', 'Reddy', 'Rao', 'Kumar', 'Singh', 'Prasad', 'Nair', 'Chawla', 'Mehta', 'Patel', 'Joshi', 'Mishra', 'Yadav', 'Bhatia'];
+  const qualifications = {
+    'Cardiology': ['MBBS, MD, DM (Cardiology)', 'MBBS, DNB (Cardiology)'],
+    'Neurology': ['MBBS, MD, DM (Neurology)', 'MBBS, MCh (Neurosurgery)'],
+    'Orthopedics': ['MBBS, MS (Orthopedics)', 'MBBS, DNB (Orthopedics)'],
+    'Oncology': ['MBBS, MD, DM (Oncology)', 'MBBS, MS, MCh (Surgical Oncology)'],
+    'Pediatrics': ['MBBS, MD (Pediatrics)', 'MBBS, DCH'],
+    'General Medicine': ['MBBS, MD (General Medicine)', 'MBBS, DNB'],
+    'General Surgery': ['MBBS, MS (General Surgery)', 'MBBS, DNB'],
+    'Radiology & Imaging': ['MBBS, MD (Radiology)', 'MBBS, DMRD'],
+    'Nephrology': ['MBBS, MD, DM (Nephrology)'],
+    'Gastroenterology': ['MBBS, MD, DM (Gastroenterology)'],
+    'Pulmonology': ['MBBS, MD, DM (Pulmonology)'],
+    'Urology': ['MBBS, MS, MCh (Urology)']
+  };
+  const specialties = Object.keys(qualifications);
+
+  const [seededHospitals] = await connection.execute('SELECT id, name FROM hospitals');
+  let extraDoctorCount = 0;
+  for (const hosp of seededHospitals) {
+    // Generate 2 to 4 doctors per hospital
+    const numDocs = Math.floor(Math.random() * 3) + 2; 
+    for (let d = 0; d < numDocs; d++) {
+      const fName = firstNames[Math.floor(Math.random() * firstNames.length)];
+      const lName = lastNames[Math.floor(Math.random() * lastNames.length)];
+      const docName = `Dr. ${fName} ${lName}`;
+      const specialty = specialties[Math.floor(Math.random() * specialties.length)];
+      const qual = qualifications[specialty][Math.floor(Math.random() * qualifications[specialty].length)];
+      const exp = Math.floor(Math.random() * 25) + 5; // 5 to 30 years
+      
+      await connection.execute(
+        `INSERT INTO hospital_doctors (hospital_id, name, specialization, qualification, experience_years, timings, bio) VALUES (?, ?, ?, ?, ?, 'Mon-Sat 10:00 AM - 4:00 PM', ?)`,
+        [hosp.id, docName, specialty, qual, exp, `${specialty} consultant at ${hosp.name}.`]
+      );
+      extraDoctorCount++;
+    }
+  }
+  console.log(`   Generated and inserted ${extraDoctorCount} doctors across all ${seededHospitals.length} hospitals.\n`);
+
+
   // ---- 6. SEED CLINICS → clinic_doctors table ----
   console.log('🩻 Seeding area-specific clinics...');
   let clinicCount = 0;

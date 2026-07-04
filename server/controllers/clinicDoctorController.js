@@ -10,9 +10,6 @@ exports.getClinicDoctors = async (req, res) => {
     if (city) {
       query += ' AND city = ?';
       params.push(city);
-    } else {
-      query += ' AND city = ?';
-      params.push('Hyderabad');
     }
     if (specialization) {
       query += ' AND specialization LIKE ?';
