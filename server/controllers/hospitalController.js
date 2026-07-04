@@ -127,3 +127,123 @@ exports.getDoctorById = async (req, res) => {
     res.status(500).json({ error: 'Server error.' });
   }
 };
+
+// POST /api/hospitals/:id/book — book a hospital appointment and trigger mock email
+exports.bookHospitalAppointment = async (req, res) => {
+  try {
+    const { appointment_date, time_slot, patient_name, patient_phone, reason, doctor_id } = req.body;
+    const hospitalId = req.params.id;
+
+    if (!appointment_date || !time_slot || !patient_name || !patient_phone) {
+      return res.status(400).json({ error: 'Date, time slot, patient name, and phone are required.' });
+    }
+
+    // Check if hospital exists
+    const [hospitals] = await pool.query('SELECT name, address FROM hospitals WHERE id = ?', [hospitalId]);
+    if (hospitals.length === 0) {
+      return res.status(404).json({ error: 'Hospital not found.' });
+    }
+    const hospitalName = hospitals[0].name;
+
+    // Check if doctor exists if selected
+    let doctorName = 'General Outpatient';
+    if (doctor_id) {
+      const [doctors] = await pool.query('SELECT name FROM hospital_doctors WHERE id = ?', [doctor_id]);
+      if (doctors.length > 0) {
+        doctorName = doctors[0].name;
+      }
+    }
+
+    // Fetch user details for email notification
+    const [users] = await pool.query('SELECT email, name FROM users WHERE id = ?', [req.user.id]);
+    const userEmail = users[0]?.email || 'patient@jeevancare.com';
+
+    // Insert appointment into database
+    const [result] = await pool.query(
+      `INSERT INTO hospital_appointments 
+       (user_id, hospital_id, doctor_id, appointment_date, time_slot, patient_name, patient_phone, reason) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [req.user.id, hospitalId, doctor_id || null, appointment_date, time_slot, patient_name, patient_phone, reason || null]
+    );
+
+    // MOCK EMAIL NOTIFICATION DISPATCH
+    const fs = require('fs');
+    const path = require('path');
+    
+    const emailSubject = `🏥 Appointment Confirmation - ${hospitalName}`;
+    const emailBody = `
+=========================================
+📧 EMAIL DISPATCH NOTIFICATION
+=========================================
+To: ${userEmail}
+Subject: ${emailSubject}
+Status: SENT SUCCESSFUL (Mock Mail API)
+-----------------------------------------
+Dear ${patient_name},
+
+Your appointment has been successfully scheduled at JeevanCare+.
+
+APPOINTMENT DETAILS:
+- Hospital: ${hospitalName}
+- Department/Doctor: ${doctorName}
+- Date: ${appointment_date}
+- Time Slot: ${time_slot}
+- Patient Contact: ${patient_phone}
+- Booking Reference ID: JC-HOSP-${result.insertId}
+
+Please arrive 15 minutes before your scheduled slot. 
+To cancel or reschedule, visit your dashboard profile page.
+
+Best regards,
+JeevanCare+ Helpdesk Team
+=========================================
+`;
+
+    // Print to server logs
+    console.log(emailBody);
+
+    // Save to server log file
+    const logDir = path.join(__dirname, '../logs');
+    if (!fs.existsSync(logDir)) {
+      fs.mkdirSync(logDir, { recursive: true });
+    }
+    fs.appendFileSync(path.join(logDir, 'emails.log'), emailBody + '\n');
+
+    res.status(201).json({
+      message: 'Hospital appointment booked successfully.',
+      bookingId: result.insertId,
+      emailSent: true,
+      appointment: {
+        id: result.insertId,
+        hospital_name: hospitalName,
+        doctor_name: doctorName,
+        appointment_date,
+        time_slot,
+        patient_name,
+        status: 'pending'
+      }
+    });
+  } catch (err) {
+    console.error('Book hospital appointment error:', err);
+    res.status(500).json({ error: 'Server error.' });
+  }
+};
+
+// GET /api/hospitals/appointments/history — list appointments of logged in user
+exports.getAppointments = async (req, res) => {
+  try {
+    const [appointments] = await pool.query(
+      `SELECT ha.*, h.name AS hospital_name, h.address AS hospital_address, hd.name AS doctor_name, hd.specialization
+       FROM hospital_appointments ha
+       JOIN hospitals h ON ha.hospital_id = h.id
+       LEFT JOIN hospital_doctors hd ON ha.doctor_id = hd.id
+       WHERE ha.user_id = ?
+       ORDER BY ha.appointment_date DESC`,
+      [req.user.id]
+    );
+    res.json({ appointments });
+  } catch (err) {
+    console.error('Get hospital appointments history error:', err);
+    res.status(500).json({ error: 'Server error.' });
+  }
+};

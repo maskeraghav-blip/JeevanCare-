@@ -241,3 +241,24 @@ CREATE TABLE IF NOT EXISTS consent_forms (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   INDEX idx_user (user_id)
 );
+
+-- ============================================
+-- Hospital Appointments Table
+-- ============================================
+CREATE TABLE IF NOT EXISTS hospital_appointments (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  hospital_id INT NOT NULL,
+  doctor_id INT,
+  appointment_date DATE NOT NULL,
+  time_slot VARCHAR(50) NOT NULL,
+  patient_name VARCHAR(150) NOT NULL,
+  patient_phone VARCHAR(20) NOT NULL,
+  reason TEXT,
+  status ENUM('pending', 'confirmed', 'completed', 'cancelled') DEFAULT 'pending',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (hospital_id) REFERENCES hospitals(id) ON DELETE CASCADE,
+  FOREIGN KEY (doctor_id) REFERENCES hospital_doctors(id) ON DELETE SET NULL
+);

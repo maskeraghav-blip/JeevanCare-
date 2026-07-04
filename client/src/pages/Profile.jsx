@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 export default function Profile() {
   const { user, logout, updateProfile } = useAuth();
   const [appointments, setAppointments] = useState([]);
+  const [hospitalAppointments, setHospitalAppointments] = useState([]);
   const [physioAppointments, setPhysioAppointments] = useState([]);
   const [nurseBookings, setNurseBookings] = useState([]);
   const [consents, setConsents] = useState([]);
@@ -26,8 +27,9 @@ export default function Profile() {
   const fetchHistory = async () => {
     setLoadingHistory(true);
     try {
-      const [appRes, physioRes, nurseRes, consentRes, ticketRes] = await Promise.all([
+      const [appRes, hospRes, physioRes, nurseRes, consentRes, ticketRes] = await Promise.all([
         api.get('/clinic-doctors/appointments'),
+        api.get('/hospitals/appointments/history'),
         api.get('/physio/appointments'),
         api.get('/nurses/bookings'),
         api.get('/consent'),
@@ -35,6 +37,7 @@ export default function Profile() {
       ]);
 
       setAppointments(appRes.data.appointments);
+      setHospitalAppointments(hospRes.data.appointments);
       setPhysioAppointments(physioRes.data.appointments);
       setNurseBookings(nurseRes.data.bookings);
       setConsents(consentRes.data.consents);
@@ -185,6 +188,9 @@ export default function Profile() {
             <button className={`tab ${activeTab === 'appointments' ? 'active' : ''}`} onClick={() => setActiveTab('appointments')}>
               🩺 Home Doctor Visits ({appointments.length + physioAppointments.length})
             </button>
+            <button className={`tab ${activeTab === 'hospitals' ? 'active' : ''}`} onClick={() => setActiveTab('hospitals')}>
+              🏥 Hospital Appointments ({hospitalAppointments.length})
+            </button>
             <button className={`tab ${activeTab === 'nurses' ? 'active' : ''}`} onClick={() => setActiveTab('nurses')}>
               🩹 Nurse Bookings ({nurseBookings.length})
             </button>
@@ -245,6 +251,37 @@ export default function Profile() {
                       </div>
                     ))}
                   </>
+                )}
+              </div>
+            ) : activeTab === 'hospitals' ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+                {hospitalAppointments.length === 0 ? (
+                  <div className="card text-center" style={{ padding: 'var(--space-8)' }}>
+                    <p style={{ color: 'var(--color-text-muted)' }}>You have no booked hospital outpatient appointments.</p>
+                  </div>
+                ) : (
+                  hospitalAppointments.map((ha) => (
+                    <div key={ha.id} className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <span className="badge badge-primary" style={{ marginBottom: 'var(--space-2)', background: 'var(--color-primary-light)', color: 'white' }}>
+                          Hospital Appointment
+                        </span>
+                        <h3 style={{ fontSize: 'var(--font-size-md)', fontWeight: 700 }}>{ha.hospital_name}</h3>
+                        <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
+                          Doctor: {ha.doctor_name || 'General Consult'} · Specialty: {ha.specialization || 'Outpatient'}
+                        </p>
+                        <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
+                          📅 {formatDate(ha.appointment_date)} · ⏰ {ha.time_slot}
+                        </p>
+                        <p style={{ color: 'var(--color-text-muted)', fontSize: 'var(--font-size-xs)', marginTop: '2px' }}>
+                          Patient: {ha.patient_name} · Contact: {ha.patient_phone}
+                        </p>
+                      </div>
+                      <span className={`badge ${STATUS_COLORS[ha.status] || 'badge-pending'}`}>
+                        {formatStatus(ha.status)}
+                      </span>
+                    </div>
+                  ))
                 )}
               </div>
             ) : activeTab === 'nurses' ? (

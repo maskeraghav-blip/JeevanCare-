@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { api } from '../context/AuthContext';
+import { api, useAuth } from '../context/AuthContext';
 import { FACILITY_ICONS } from '../utils/constants';
 import GoogleMap from '../components/common/GoogleMap';
 
@@ -23,6 +23,50 @@ export default function HospitalDetail() {
     };
     fetchDetail();
   }, [id]);
+
+  const { user } = useAuth();
+
+  // Booking Form State
+  const [patientName, setPatientName] = useState(user?.name || '');
+  const [patientPhone, setPatientPhone] = useState('');
+  const [appointmentDate, setAppointmentDate] = useState('');
+  const [timeSlot, setTimeSlot] = useState('');
+  const [doctorId, setDoctorId] = useState('');
+  const [reason, setReason] = useState('');
+  const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [bookingError, setBookingError] = useState('');
+  const [bookingLoading, setBookingLoading] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setPatientName(user.name);
+    }
+  }, [user]);
+
+  const handleBookingSubmit = async (e) => {
+    e.preventDefault();
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    setBookingLoading(true);
+    setBookingError('');
+    try {
+      await api.post(`/hospitals/${id}/book`, {
+        patient_name: patientName,
+        patient_phone: patientPhone,
+        appointment_date: appointmentDate,
+        time_slot: timeSlot,
+        doctor_id: doctorId || null,
+        reason
+      });
+      setBookingSuccess(true);
+    } catch (err) {
+      setBookingError(err.response?.data?.error || 'Failed to book appointment. Please try again.');
+    } finally {
+      setBookingLoading(false);
+    }
+  };
 
   if (loading) return <div className="loading-spinner" style={{ minHeight: '60vh' }}></div>;
   if (!data || !data.hospital) {
@@ -162,6 +206,139 @@ export default function HospitalDetail() {
                 <GoogleMap locations={[hospital]} type="hospitals" />
               </div>
             )}
+
+            {/* Booking Request Form */}
+            <div className="card glass-card" style={{ marginTop: 'var(--space-6)' }}>
+              <h3 style={{ fontSize: 'var(--font-size-lg)', fontWeight: 700, marginBottom: 'var(--space-4)' }}>
+                📅 Book Appointment
+              </h3>
+
+              {bookingSuccess ? (
+                <div style={{ textAlign: 'center', padding: 'var(--space-4)' }}>
+                  <div style={{ fontSize: '3rem', marginBottom: 'var(--space-2)' }}>🎉</div>
+                  <h4 style={{ color: 'var(--color-accent-green)', fontWeight: 700, marginBottom: 'var(--space-2)' }}>
+                    Booking Requested!
+                  </h4>
+                  <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-4)' }}>
+                    Confirmation email has been sent successfully. Check your dashboard profile for status.
+                  </p>
+                  <button className="btn btn-secondary btn-sm" onClick={() => setBookingSuccess(false)}>
+                    Book Another
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleBookingSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+                  {bookingError && (
+                    <div className="alert alert-danger" style={{ fontSize: 'var(--font-size-xs)' }}>
+                      {bookingError}
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="form-label" style={{ fontSize: 'var(--font-size-xs)' }}>PATIENT NAME</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      style={{ padding: 'var(--space-2)' }}
+                      placeholder="Enter patient name"
+                      value={patientName}
+                      onChange={(e) => setPatientName(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="form-label" style={{ fontSize: 'var(--font-size-xs)' }}>CONTACT PHONE</label>
+                    <input
+                      type="tel"
+                      className="form-input"
+                      style={{ padding: 'var(--space-2)' }}
+                      placeholder="Enter contact number"
+                      value={patientPhone}
+                      onChange={(e) => setPatientPhone(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 'var(--space-3)' }}>
+                    <div>
+                      <label className="form-label" style={{ fontSize: 'var(--font-size-xs)' }}>CHOOSE DATE</label>
+                      <input
+                        type="date"
+                        className="form-input"
+                        style={{ padding: 'var(--space-2)' }}
+                        value={appointmentDate}
+                        onChange={(e) => setAppointmentDate(e.target.value)}
+                        min={new Date().toISOString().split('T')[0]}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="form-label" style={{ fontSize: 'var(--font-size-xs)' }}>PREFERRED SLOT</label>
+                      <select
+                        className="form-select"
+                        style={{ padding: 'var(--space-2)' }}
+                        value={timeSlot}
+                        onChange={(e) => setTimeSlot(e.target.value)}
+                        required
+                      >
+                        <option value="">Select slot</option>
+                        <option value="09:00 AM - 10:00 AM">09:00 AM - 10:00 AM</option>
+                        <option value="10:00 AM - 11:00 AM">10:00 AM - 11:00 AM</option>
+                        <option value="11:00 AM - 12:00 PM">11:00 AM - 12:00 PM</option>
+                        <option value="02:00 PM - 03:00 PM">02:00 PM - 03:00 PM</option>
+                        <option value="03:00 PM - 04:00 PM">03:00 PM - 04:00 PM</option>
+                        <option value="04:00 PM - 05:00 PM">04:00 PM - 05:00 PM</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="form-label" style={{ fontSize: 'var(--font-size-xs)' }}>SELECT DOCTOR (OPTIONAL)</label>
+                    <select
+                      className="form-select"
+                      style={{ padding: 'var(--space-2)' }}
+                      value={doctorId}
+                      onChange={(e) => setDoctorId(e.target.value)}
+                    >
+                      <option value="">General Outpatient Consult</option>
+                      {doctors.map(d => (
+                        <option key={d.id} value={d.id}>
+                          {d.name} ({d.specialization})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="form-label" style={{ fontSize: 'var(--font-size-xs)' }}>REASON FOR VISIT</label>
+                    <textarea
+                      className="form-input"
+                      rows="2"
+                      style={{ padding: 'var(--space-2)', resize: 'none' }}
+                      placeholder="Brief symptoms or reason"
+                      value={reason}
+                      onChange={(e) => setReason(e.target.value)}
+                    />
+                  </div>
+
+                  {!user ? (
+                    <Link to="/login" className="btn btn-primary" style={{ textAlign: 'center', width: '100%', marginTop: 'var(--space-2)' }}>
+                      Login to Book Appointment
+                    </Link>
+                  ) : (
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      style={{ width: '100%', marginTop: 'var(--space-2)' }}
+                      disabled={bookingLoading}
+                    >
+                      {bookingLoading ? 'Requesting...' : 'Confirm Appointment'}
+                    </button>
+                  )}
+                </form>
+              )}
+            </div>
           </div>
         </div>
       </div>
