@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { api, useAuth } from '../context/AuthContext';
+import GoogleMap from '../components/common/GoogleMap';
 
 export default function PhysioDetail() {
   const { id } = useParams();
@@ -145,6 +146,12 @@ export default function PhysioDetail() {
                 </div>
               )}
             </div>
+
+            {physio.lat && physio.lng && (
+              <div style={{ marginTop: 'var(--space-6)', height: '220px', borderRadius: 'var(--radius-lg)', overflow: 'hidden', border: '1px solid var(--color-border)' }}>
+                <GoogleMap locations={[physio]} type="clinics" />
+              </div>
+            )}
           </div>
         </div>
 

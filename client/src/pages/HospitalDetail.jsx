@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { api } from '../context/AuthContext';
 import { FACILITY_ICONS } from '../utils/constants';
+import GoogleMap from '../components/common/GoogleMap';
 
 export default function HospitalDetail() {
   const { id } = useParams();
@@ -155,6 +156,12 @@ export default function HospitalDetail() {
               >
                 📞 Contact Desk
               </a>
+            )}
+
+            {hospital.lat && hospital.lng && (
+              <div style={{ marginTop: 'var(--space-6)', height: '220px', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+                <GoogleMap locations={[hospital]} type="hospitals" />
+              </div>
             )}
           </div>
         </div>

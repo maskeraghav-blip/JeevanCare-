@@ -7,6 +7,12 @@ export default function GoogleMap({ locations, type = 'hospitals', onMarkerClick
   const [mapLoaded, setMapLoaded] = useState(false);
 
   useEffect(() => {
+    // Set up global handler for Google Maps authentication failures (e.g. invalid key)
+    window.gm_authFailure = () => {
+      console.warn('Google Maps authentication failed. Using interactive fallback grid.');
+      setMapError(true);
+    };
+
     // Check if Google Maps is already loaded
     if (window.google && window.google.maps) {
       setMapLoaded(true);
@@ -36,6 +42,11 @@ export default function GoogleMap({ locations, type = 'hospitals', onMarkerClick
       script.addEventListener('load', () => setMapLoaded(true));
       script.addEventListener('error', () => setMapError(true));
     }
+
+    return () => {
+      // Clean up global listener if needed
+      delete window.gm_authFailure;
+    };
   }, []);
 
   useEffect(() => {
@@ -45,6 +56,7 @@ export default function GoogleMap({ locations, type = 'hospitals', onMarkerClick
       const map = new window.google.maps.Map(mapRef.current, {
         center: HYDERABAD_CENTER,
         zoom: 12,
+        mapTypeId: 'hybrid',
         styles: [
           {
             "featureType": "administrative",
@@ -124,14 +136,14 @@ export default function GoogleMap({ locations, type = 'hospitals', onMarkerClick
     return (
       <div className="map-container" style={{
         position: 'relative',
-        background: '#E2E8F0',
+        background: '#0F172A',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        color: 'var(--color-text-secondary)',
+        color: '#94A3B8',
         padding: 'var(--space-6)',
-        backgroundImage: 'radial-gradient(#CBD5E1 1.5px, transparent 1.5px)',
+        backgroundImage: 'radial-gradient(#334155 1.5px, transparent 1.5px)',
         backgroundSize: '24px 24px'
       }}>
         <div style={{
