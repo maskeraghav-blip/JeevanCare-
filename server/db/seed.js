@@ -549,9 +549,6 @@ const NATIONAL_CLINICS = [
   { name: 'Medicover Family Clinics', specialty: 'Family Medicine' },
 ];
 
-// =============================================
-// SPECIALTY DOCTORS (for hospital_doctors table)
-// =============================================
 const SPECIALTY_DOCTORS = {
   'General Medicine': [
     { name: 'Dr. Mohsin Wali', hospital: 'Apollo Hospitals', qualification: 'MBBS, MD', experience: 45, city: 'New Delhi' },
@@ -578,57 +575,144 @@ const SPECIALTY_DOCTORS = {
     { name: 'Dr. Ashok Seth', hospital: 'Fortis Healthcare', qualification: 'MBBS, MD, DM', experience: 40, city: 'New Delhi' },
     { name: 'Dr. Balbir Singh', hospital: 'Max Healthcare', qualification: 'MBBS, MD, DM', experience: 35, city: 'New Delhi' },
     { name: 'Dr. Ramakanta Panda', hospital: 'Apollo Hospitals', qualification: 'MBBS, MS, MCh', experience: 35, city: 'New Delhi' },
+    { name: 'Dr. T. S. Kler', hospital: 'Fortis Healthcare', qualification: 'MBBS, MD, DM', experience: 38, city: 'New Delhi' },
+    { name: 'Dr. K. M. Cherian', hospital: 'Apollo Hospitals', qualification: 'MBBS, MS, MCh', experience: 42, city: 'Chennai' },
+    { name: 'Dr. Z. S. Meharwal', hospital: 'Fortis Healthcare', qualification: 'MBBS, MS, MCh', experience: 35, city: 'New Delhi' },
+    { name: 'Dr. Upendra Kaul', hospital: 'Max Healthcare', qualification: 'MBBS, MD, DM', experience: 40, city: 'New Delhi' },
+    { name: 'Dr. Y. K. Mishra', hospital: 'Manipal Hospitals', qualification: 'MBBS, MS, MCh', experience: 35, city: 'New Delhi' }
   ],
   'Neurology': [
     { name: 'Dr. Sandeep Vaishya', hospital: 'Fortis Healthcare', qualification: 'MBBS, MS, MCh', experience: 30, city: 'Gurugram' },
     { name: 'Dr. V. S. Mehta', hospital: 'Apollo Hospitals', qualification: 'MBBS, MS, MCh', experience: 40, city: 'New Delhi' },
+    { name: 'Dr. Rana Patir', hospital: 'Fortis Healthcare', qualification: 'MBBS, MS, MCh', experience: 32, city: 'New Delhi' },
+    { name: 'Dr. Alok Ranjan', hospital: 'Apollo Hospitals', qualification: 'MBBS, MS, MCh', experience: 28, city: 'Hyderabad' },
     { name: 'Dr. Sudhir Kumar', hospital: 'Apollo Hospitals', qualification: 'MBBS, MD, DM', experience: 25, city: 'Hyderabad' },
+    { name: 'Dr. K. Sridhar', hospital: 'Apollo Hospitals', qualification: 'MBBS, MS, MCh', experience: 30, city: 'Chennai' },
     { name: 'Dr. Praveen Gupta', hospital: 'Fortis Healthcare', qualification: 'MBBS, MD, DM', experience: 30, city: 'Gurugram' },
+    { name: 'Dr. Man Mohan Mehndiratta', hospital: 'Max Healthcare', qualification: 'MBBS, MD, DM', experience: 35, city: 'New Delhi' },
+    { name: 'Dr. Rajendra Prasad', hospital: 'Apollo Hospitals', qualification: 'MBBS, FRCS', experience: 38, city: 'New Delhi' },
+    { name: 'Dr. Atul Prasad', hospital: 'Fortis Healthcare', qualification: 'MBBS, MD, DM', experience: 30, city: 'New Delhi' }
   ],
   'Orthopedics': [
     { name: 'Dr. Ramneek Mahajan', hospital: 'Max Healthcare', qualification: 'MBBS, MS', experience: 30, city: 'New Delhi' },
     { name: 'Dr. IPS Oberoi', hospital: 'Apollo Hospitals', qualification: 'MBBS, MS', experience: 35, city: 'New Delhi' },
     { name: 'Dr. Ashok Rajgopal', hospital: 'Medicover Hospitals', qualification: 'MBBS, MS', experience: 40, city: 'Gurugram' },
+    { name: 'Dr. Dinshaw Pardiwala', hospital: 'Kokilaben Hospital', qualification: 'MBBS, MS', experience: 28, city: 'Mumbai' },
+    { name: 'Dr. Sanjay Desai', hospital: 'Hinduja Hospital', qualification: 'MBBS, MS', experience: 32, city: 'Mumbai' },
+    { name: 'Dr. S. K. S. Marya', hospital: 'Max Healthcare', qualification: 'MBBS, MS', experience: 35, city: 'New Delhi' },
+    { name: 'Dr. Bipin Walia', hospital: 'Max Healthcare', qualification: 'MBBS, MS, MCh', experience: 30, city: 'New Delhi' },
+    { name: 'Dr. H. S. Chhabra', hospital: 'Indian Spinal Injuries Centre', qualification: 'MBBS, MS', experience: 32, city: 'New Delhi' },
     { name: 'Dr. A. V. Gurava Reddy', hospital: 'Apollo Hospitals', qualification: 'MBBS, MS, MCh', experience: 25, city: 'Hyderabad' },
+    { name: 'Dr. Abhay Nene', hospital: 'Wockhardt Hospital', qualification: 'MBBS, MS', experience: 24, city: 'Mumbai' }
   ],
   'Oncology': [
     { name: 'Dr. Vinod Raina', hospital: 'Fortis Healthcare', qualification: 'MBBS, MD, DM', experience: 40, city: 'New Delhi' },
+    { name: 'Dr. Suresh Advani', hospital: 'Jaslok Hospital', qualification: 'MBBS, MD', experience: 45, city: 'Mumbai' },
+    { name: 'Dr. Rajendra Badwe', hospital: 'Tata Memorial Hospital', qualification: 'MBBS, MS', experience: 38, city: 'Mumbai' },
     { name: 'Dr. Vijay Anand Reddy', hospital: 'Apollo Hospitals', qualification: 'MBBS, MD', experience: 30, city: 'Hyderabad' },
+    { name: 'Dr. P. Jagannath', hospital: 'Lilavati Hospital', qualification: 'MBBS, MS', experience: 35, city: 'Mumbai' },
     { name: 'Dr. Harit Chaturvedi', hospital: 'Max Healthcare', qualification: 'MBBS, MS, MCh', experience: 30, city: 'New Delhi' },
+    { name: 'Dr. G. V. Rao', hospital: 'AIG Hospitals', qualification: 'MBBS, MS, MCh', experience: 32, city: 'Hyderabad' },
+    { name: 'Dr. Shailesh Shrikhande', hospital: 'Tata Memorial Hospital', qualification: 'MBBS, MS', experience: 25, city: 'Mumbai' },
+    { name: 'Dr. Amit Agarwal', hospital: 'Fortis Healthcare', qualification: 'MBBS, MS', experience: 24, city: 'Noida' },
+    { name: 'Dr. Kumar Prabhash', hospital: 'Tata Memorial Hospital', qualification: 'MBBS, MD', experience: 26, city: 'Mumbai' }
   ],
   'Nephrology': [
     { name: 'Dr. H. Sudarshan Ballal', hospital: 'Manipal Hospitals', qualification: 'MBBS, MD, DM', experience: 40, city: 'Bengaluru' },
     { name: 'Dr. Georgi Abraham', hospital: 'Apollo Hospitals', qualification: 'MBBS, MD, DM', experience: 35, city: 'Chennai' },
     { name: 'Dr. Vivekanand Jha', hospital: 'Medicover Hospitals', qualification: 'MBBS, MD, DM', experience: 30, city: 'New Delhi' },
+    { name: 'Dr. Sunil Prakash', hospital: 'BLK-Max Hospital', qualification: 'MBBS, MD, DM', experience: 32, city: 'New Delhi' },
+    { name: 'Dr. Raj Kumar Sharma', hospital: 'Fortis Healthcare', qualification: 'MBBS, MD, DM', experience: 35, city: 'Mohali' },
+    { name: 'Dr. Anil Kumar Bhansali', hospital: 'Max Healthcare', qualification: 'MBBS, MD, DM', experience: 30, city: 'New Delhi' },
+    { name: 'Dr. Sandeep Guleria', hospital: 'Apollo Hospitals', qualification: 'MBBS, MS, DNB', experience: 34, city: 'New Delhi' },
+    { name: 'Dr. Ajit Huilgol', hospital: 'Columbia Asia Hospital', qualification: 'MBBS, MD', experience: 32, city: 'Bengaluru' },
+    { name: 'Dr. Kute V. B.', hospital: 'IKDRC', qualification: 'MBBS, MD, DM', experience: 22, city: 'Ahmedabad' },
+    { name: 'Dr. Pradeep Varma', hospital: 'Care Hospitals', qualification: 'MBBS, MD, DM', experience: 25, city: 'Hyderabad' }
   ],
   'Gastroenterology': [
     { name: 'Dr. D. Nageshwar Reddy', hospital: 'AIG Hospitals', qualification: 'MBBS, MD, DM', experience: 40, city: 'Hyderabad' },
     { name: 'Dr. Samiran Nundy', hospital: 'Max Healthcare', qualification: 'MBBS, MS', experience: 45, city: 'New Delhi' },
     { name: 'Dr. Randhir Sud', hospital: 'Medicover Hospitals', qualification: 'MBBS, MS', experience: 35, city: 'New Delhi' },
+    { name: 'Dr. Mohan Thomas', hospital: 'Apollo Hospitals', qualification: 'MBBS, MD', experience: 32, city: 'Chennai' },
+    { name: 'Dr. Subhash Gupta', hospital: 'Max Healthcare', qualification: 'MBBS, MS', experience: 30, city: 'New Delhi' },
+    { name: 'Dr. Arvinder Singh Soin', hospital: 'Medanta Hospital', qualification: 'MBBS, MS, FRCS', experience: 34, city: 'Gurugram' },
+    { name: 'Dr. Deepak Govil', hospital: 'Max Healthcare', qualification: 'MBBS, MS', experience: 28, city: 'New Delhi' },
+    { name: 'Dr. Vivek Vij', hospital: 'Fortis Healthcare', qualification: 'MBBS, MS', experience: 25, city: 'Noida' },
+    { name: 'Dr. S. M. Shuaib Zaidi', hospital: 'Apollo Hospitals', qualification: 'MBBS, MS', experience: 24, city: 'New Delhi' },
+    { name: 'Dr. A. S. Soin', hospital: 'Medanta Hospital', qualification: 'MBBS, MS', experience: 34, city: 'Gurugram' }
   ],
   'Pulmonology': [
+    { name: 'Dr. Arvind Kumar', hospital: 'Medanta Hospital', qualification: 'MBBS, MS', experience: 35, city: 'Gurugram' },
+    { name: 'Dr. S. K. Chhabra', hospital: 'Primus Super Speciality', qualification: 'MBBS, MD', experience: 38, city: 'New Delhi' },
     { name: 'Dr. Randeep Guleria', hospital: 'Medicover Hospitals', qualification: 'MBBS, MD', experience: 35, city: 'New Delhi' },
     { name: 'Dr. Deepak Talwar', hospital: 'Max Healthcare', qualification: 'MBBS, MD', experience: 30, city: 'New Delhi' },
+    { name: 'Dr. Raj B. Singh', hospital: 'Apollo Hospitals', qualification: 'MBBS, MD', experience: 32, city: 'Chennai' },
+    { name: 'Dr. Hemant Kalra', hospital: 'Fortis Healthcare', qualification: 'MBBS, MD', experience: 26, city: 'New Delhi' },
+    { name: 'Dr. Sandeep Nayar', hospital: 'Fortis Healthcare', qualification: 'MBBS, MD', experience: 28, city: 'New Delhi' },
+    { name: 'Dr. J. C. Suri', hospital: 'Fortis Healthcare', qualification: 'MBBS, MD', experience: 38, city: 'New Delhi' },
+    { name: 'Dr. Bharat Gopal', hospital: 'Max Healthcare', qualification: 'MBBS, MD', experience: 25, city: 'New Delhi' },
+    { name: 'Dr. Vikas Maurya', hospital: 'Fortis Healthcare', qualification: 'MBBS, MD', experience: 22, city: 'New Delhi' }
   ],
   'Urology': [
-    { name: 'Dr. Mahesh Desai', hospital: 'Apollo Hospitals', qualification: 'MBBS, MS, MCh', experience: 40, city: 'Ahmedabad' },
+    { name: 'Dr. Mahesh Desai', hospital: 'Muljibhai Patel Urology', qualification: 'MBBS, MS, MCh', experience: 40, city: 'Nadiad' },
     { name: 'Dr. Rajesh Ahlawat', hospital: 'Medicover Hospitals', qualification: 'MBBS, MS, MCh', experience: 35, city: 'Gurugram' },
     { name: 'Dr. Anant Kumar', hospital: 'Max Healthcare', qualification: 'MBBS, MS, MCh', experience: 35, city: 'New Delhi' },
+    { name: 'Dr. Sanjay Gogoi', hospital: 'Manipal Hospitals', qualification: 'MBBS, MS, MCh', experience: 26, city: 'New Delhi' },
+    { name: 'Dr. Ashish Sabharwal', hospital: 'Apollo Hospitals', qualification: 'MBBS, MS, MCh', experience: 25, city: 'New Delhi' },
+    { name: 'Dr. Narmada Prasad Gupta', hospital: 'Medanta Hospital', qualification: 'MBBS, MS, MCh', experience: 42, city: 'Gurugram' },
+    { name: 'Dr. Mohan Keshavamurthy', hospital: 'Fortis Healthcare', qualification: 'MBBS, MS, MCh', experience: 28, city: 'Bengaluru' },
+    { name: 'Dr. Rakesh Kapoor', hospital: 'SGPGIMS', qualification: 'MBBS, MS, MCh', experience: 32, city: 'Lucknow' },
+    { name: 'Dr. R. V. Prabhu', hospital: 'KMC Hospital', qualification: 'MBBS, MS, MCh', experience: 30, city: 'Mangaluru' },
+    { name: 'Dr. Ravi Mohanka', hospital: 'Global Hospitals', qualification: 'MBBS, MS, MCh', experience: 22, city: 'Mumbai' }
   ],
   'Obstetrics & Gynecology': [
     { name: 'Dr. Kamini Rao', hospital: 'Manipal Hospitals', qualification: 'MBBS, MD, DGO', experience: 35, city: 'Bengaluru' },
+    { name: 'Dr. Shobha Gupta', hospital: 'Mother\'s Lap IVF Center', qualification: 'MBBS, MD', experience: 24, city: 'New Delhi' },
+    { name: 'Dr. Renu Raina Sehgal', hospital: 'Artemis Hospital', qualification: 'MBBS, MD', experience: 25, city: 'Gurugram' },
+    { name: 'Dr. Indira Hinduja', hospital: 'Jaslok Hospital', qualification: 'MBBS, MD, PhD', experience: 42, city: 'Mumbai' },
     { name: 'Dr. Nandita Palshetkar', hospital: 'Fortis Healthcare', qualification: 'MBBS, MD, DGO', experience: 30, city: 'Mumbai' },
+    { name: 'Dr. Sadhna Desai', hospital: 'Fertility Clinic', qualification: 'MBBS, MD', experience: 38, city: 'Mumbai' },
     { name: 'Dr. Alka Kriplani', hospital: 'Apollo Hospitals', qualification: 'MBBS, MD', experience: 35, city: 'New Delhi' },
+    { name: 'Dr. Neerja Goel', hospital: 'Max Healthcare', qualification: 'MBBS, MD', experience: 32, city: 'New Delhi' },
+    { name: 'Dr. Sunita Tandulwadkar', hospital: 'Ruby Hall Clinic', qualification: 'MBBS, MD', experience: 28, city: 'Pune' },
+    { name: 'Dr. Shirish Sheth', hospital: 'Breach Candy Hospital', qualification: 'MBBS, MD', experience: 45, city: 'Mumbai' }
   ],
   'Pediatrics': [
     { name: 'Dr. Krishna Chugh', hospital: 'Fortis Healthcare', qualification: 'MBBS, MD', experience: 35, city: 'Gurugram' },
     { name: 'Dr. Suresh Birajdar', hospital: 'Narayana Health', qualification: 'MBBS, MD', experience: 25, city: 'Bengaluru' },
+    { name: 'Dr. S. K. Kabra', hospital: 'AIIMS', qualification: 'MBBS, MD', experience: 32, city: 'New Delhi' },
+    { name: 'Dr. V. K. Paul', hospital: 'NITI Aayog / AIIMS', qualification: 'MBBS, MD, PhD', experience: 38, city: 'New Delhi' },
     { name: 'Dr. Bakul Parekh', hospital: 'Apollo Hospitals', qualification: 'MBBS, MD', experience: 30, city: 'Mumbai' },
+    { name: 'Dr. P. M. Nair', hospital: 'Amrita Hospital', qualification: 'MBBS, MD', experience: 40, city: 'Kochi' },
+    { name: 'Dr. Meharban Singh', hospital: 'AIIMS', qualification: 'MBBS, MD', experience: 45, city: 'New Delhi' },
+    { name: 'Dr. Gautham Suresh', hospital: 'Medanta Hospital', qualification: 'MBBS, MD', experience: 24, city: 'Gurugram' },
+    { name: 'Dr. Santosh Soans', hospital: 'AJ Hospital', qualification: 'MBBS, MD', experience: 28, city: 'Mangaluru' },
+    { name: 'Dr. Jacob Puliyel', hospital: 'St. Stephens Hospital', qualification: 'MBBS, MD', experience: 35, city: 'New Delhi' }
+  ],
+  'ICU & Critical Care': [
+    { name: 'Dr. Sahish Vaikunth Kamat', hospital: 'Fortis Healthcare', qualification: 'MBBS, MD', experience: 24, city: 'Mumbai' },
+    { name: 'Dr. Yatin Mehta', hospital: 'Medanta Hospital', qualification: 'MBBS, MD', experience: 35, city: 'Gurugram' },
+    { name: 'Dr. Subhal Dixit', hospital: 'Sanjeevan Hospital', qualification: 'MBBS, MD', experience: 26, city: 'Pune' },
+    { name: 'Dr. Dhruva Chaudhry', hospital: 'PGIMS', qualification: 'MBBS, MD', experience: 30, city: 'Rohtak' },
+    { name: 'Dr. Rajesh Chawla', hospital: 'Indraprastha Apollo', qualification: 'MBBS, MD', experience: 32, city: 'New Delhi' },
+    { name: 'Dr. Kapil Zirpe', hospital: 'Ruby Hall Clinic', qualification: 'MBBS, MD', experience: 28, city: 'Pune' },
+    { name: 'Dr. Deepak Govil', hospital: 'Max Healthcare', qualification: 'MBBS, MD', experience: 28, city: 'New Delhi' },
+    { name: 'Dr. Atul Kulkarni', hospital: 'Tata Memorial Hospital', qualification: 'MBBS, MD', experience: 30, city: 'Mumbai' },
+    { name: 'Dr. Srinivas Samavedam', hospital: 'Care Hospitals', qualification: 'MBBS, MD', experience: 25, city: 'Hyderabad' },
+    { name: 'Dr. Subhash Todi', hospital: 'AMRI Hospitals', qualification: 'MBBS, MD', experience: 34, city: 'Kolkata' }
   ],
   'Radiology & Imaging': [
     { name: 'Dr. Harsh Mahajan', hospital: 'Medicover Hospitals', qualification: 'MBBS, MD', experience: 35, city: 'New Delhi' },
     { name: 'Dr. Arjun Kalyanpur', hospital: 'Manipal Hospitals', qualification: 'MBBS, MD', experience: 30, city: 'Bengaluru' },
-  ],
+    { name: 'Dr. Jitendra Kumar', hospital: 'Max Healthcare', qualification: 'MBBS, MD', experience: 28, city: 'New Delhi' },
+    { name: 'Dr. C. Amarnath', hospital: 'Government Stanley Hospital', qualification: 'MBBS, MD', experience: 32, city: 'Chennai' },
+    { name: 'Dr. N. R. Jagannathan', hospital: 'AIIMS', qualification: 'PhD (MRI)', experience: 38, city: 'New Delhi' },
+    { name: 'Dr. Sanjay Sharma', hospital: 'AIIMS', qualification: 'MBBS, MD', experience: 30, city: 'New Delhi' },
+    { name: 'Dr. Sandeep Sharma', hospital: 'Fortis Healthcare', qualification: 'MBBS, MD', experience: 25, city: 'Noida' },
+    { name: 'Dr. S. K. Gupta', hospital: 'Max Healthcare', qualification: 'MBBS, MD', experience: 34, city: 'New Delhi' },
+    { name: 'Dr. N. K. Venkataramana', hospital: 'BGS Gleneagles', qualification: 'MBBS, MS', experience: 35, city: 'Bengaluru' },
+    { name: 'Dr. Rahul Deep G', hospital: 'Altius Hospital', qualification: 'MBBS, MD', experience: 22, city: 'Bengaluru' }
+  ]
 };
 
 // =============================================
