@@ -27,11 +27,11 @@
   --color-accent-blue-light: #dbeafe;
 
   /* Neutrals */
-  --color-bg: #F8FAFC;
+  --color-bg: #e5f5f4; /* 30% more colorful, tinted background matching primary teal */
   --color-bg-white: #FFFFFF;
   --color-bg-card: #FFFFFF;
-  --color-border: #E2E8F0;
-  --color-border-light: #F1F5F9;
+  --color-border: #ccdcdb; /* Matched tinted border */
+  --color-border-light: #e5f5f4;
   --color-text-primary: #0F172A;
   --color-text-secondary: #475569;
   --color-text-muted: #94A3B8;
@@ -107,7 +107,8 @@ body {
   font-family: var(--font-family);
   font-size: var(--font-size-base);
   color: var(--color-text-primary);
-  background-color: var(--color-bg);
+  background: linear-gradient(135deg, #e5f5f4 0%, #dcfce7 50%, #ecfeff 100%);
+  background-attachment: fixed;
   line-height: 1.6;
   min-height: 100vh;
 }
