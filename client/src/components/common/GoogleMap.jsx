@@ -20,7 +20,7 @@ export default function GoogleMap({ locations, type = 'hospitals', onMarkerClick
     }
 
     // Try to load script
-    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
+    const apiKey = import.meta.env.API_GOOGLE_KEY || import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
     if (!apiKey || apiKey === '' || !apiKey.startsWith('AIzaSy')) {
       setMapError(true);
       return;
