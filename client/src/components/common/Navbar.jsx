@@ -50,42 +50,46 @@ export default function Navbar() {
           <span className={`hamburger ${menuOpen ? 'open' : ''}`}></span>
         </button>
 
-        <div className={`navbar-links ${menuOpen ? 'open' : ''}`}>
-          {navLinks.map(link => (
-            <Link
-              key={link.path}
-              to={link.path}
-              className={`nav-link ${location.pathname.startsWith(link.path) ? 'active' : ''}`}
-            >
-              <span className="nav-label">{link.label}</span>
-            </Link>
-          ))}
+        <div className={`navbar-menu ${menuOpen ? 'open' : ''}`}>
+          <div className="navbar-links">
+            {navLinks.map(link => (
+              <Link
+                key={link.path}
+                to={link.path}
+                className={`nav-link ${location.pathname.startsWith(link.path) ? 'active' : ''}`}
+              >
+                <span className="nav-label">{link.label}</span>
+              </Link>
+            ))}
+          </div>
 
-          {user ? (
-            <div className="profile-wrapper" ref={profileRef}>
-              <button className="profile-btn" onClick={() => setProfileOpen(!profileOpen)}>
-                <span className="profile-avatar">{user.name?.charAt(0).toUpperCase()}</span>
-              </button>
-              {profileOpen && (
-                <div className="profile-dropdown">
-                  <div className="dropdown-header">
-                    <span className="dropdown-name">{user.name}</span>
-                    <span className="dropdown-email">{user.email}</span>
+          <div className="navbar-actions">
+            {user ? (
+              <div className="profile-wrapper" ref={profileRef}>
+                <button className="profile-btn" onClick={() => setProfileOpen(!profileOpen)}>
+                  <span className="profile-avatar">{user.name?.charAt(0).toUpperCase()}</span>
+                </button>
+                {profileOpen && (
+                  <div className="profile-dropdown">
+                    <div className="dropdown-header">
+                      <span className="dropdown-name">{user.name}</span>
+                      <span className="dropdown-email">{user.email}</span>
+                    </div>
+                    <Link to="/profile" className="dropdown-item" onClick={() => setProfileOpen(false)}>
+                      👤 My Profile
+                    </Link>
+                    <button className="dropdown-item logout-item" onClick={handleLogout}>
+                      🚪 Logout
+                    </button>
                   </div>
-                  <Link to="/profile" className="dropdown-item" onClick={() => setProfileOpen(false)}>
-                    👤 My Profile
-                  </Link>
-                  <button className="dropdown-item logout-item" onClick={handleLogout}>
-                    🚪 Logout
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <Link to="/login" className="btn btn-primary btn-sm nav-login-btn">
-              Login
-            </Link>
-          )}
+                )}
+              </div>
+            ) : (
+              <Link to="/login" className="btn btn-primary btn-sm nav-login-btn">
+                Login
+              </Link>
+            )}
+          </div>
         </div>
       </div>
     </nav>
