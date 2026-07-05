@@ -80,7 +80,8 @@ app.get('/api/admin/db-init', async (req, res) => {
     console.log('⏳ Running seed script...');
     const seedPath = require.resolve('./db/seed.js');
     delete require.cache[seedPath];
-    require('./db/seed.js');
+    const seed = require('./db/seed.js');
+    await seed();
 
     res.json({
       status: 'ok',

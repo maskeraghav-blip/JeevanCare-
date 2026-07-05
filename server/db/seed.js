@@ -1029,7 +1029,11 @@ async function seed() {
   await connection.end();
 }
 
-seed().catch(err => {
-  console.error('❌ Seed failed:', err.message);
-  process.exit(1);
-});
+module.exports = seed;
+
+if (require.main === module) {
+  seed().catch(err => {
+    console.error('❌ Seed failed:', err.message);
+    process.exit(1);
+  });
+}

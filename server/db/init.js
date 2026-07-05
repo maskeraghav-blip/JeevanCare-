@@ -34,11 +34,8 @@ async function init() {
 
   // 3. Run seed.js logic
   console.log('⏳ Running seed script...');
-  // Require and run seed logic
   const seed = require('./seed.js');
-  // Since seed is executed on import or requires execution, let's verify if seed is an exported function or self-executing.
-  // In seed.js, we have self-executing seed() function: `seed().catch(...)`.
-  // So requiring it will run it automatically!
+  await seed();
 }
 
 init().catch(err => {
