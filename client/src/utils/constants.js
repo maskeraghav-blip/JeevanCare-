@@ -1,4 +1,4 @@
-export const API_URL = 'http://localhost:5000/api';
+export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 export const HYDERABAD_CENTER = { lat: 17.385044, lng: 78.486671 };
 export const DEFAULT_ZOOM = 12;

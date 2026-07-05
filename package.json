@@ -1,0 +1,8 @@
+{
+  "name": "jeevancare-monorepo",
+  "version": "1.0.0",
+  "description": "JeevanCare+ Full-Stack Healthcare Platform Monorepo",
+  "scripts": {
+    "build": "cd client && npm install && npm run build"
+  }
+}
