@@ -1,6 +1,6 @@
 -- JeevanCare+ Seed Data
 -- Mock/dummy data for nurses and example placeholder rows for other modules
-USE jeevancare_db;
+-- USE jeevancare_db;
 
 -- ============================================
 -- MOCK NURSES (Clearly dummy data)

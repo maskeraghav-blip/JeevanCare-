@@ -2,8 +2,8 @@
 -- MySQL 8.0+
 -- Default scope: Hyderabad, Telangana — city/state columns included for future India-wide expansion
 
-CREATE DATABASE IF NOT EXISTS jeevancare_db;
-USE jeevancare_db;
+-- CREATE DATABASE IF NOT EXISTS jeevancare_db;
+-- USE jeevancare_db;
 
 -- ============================================
 -- Users Table

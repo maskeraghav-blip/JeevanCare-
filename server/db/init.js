@@ -17,6 +17,11 @@ async function init() {
 
   console.log('✅ Connected to MySQL Server');
 
+  const dbName = process.env.DB_NAME || 'jeevancare_db';
+  console.log(`⏳ Ensuring database "${dbName}" exists...`);
+  await connection.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\`;`);
+  await connection.query(`USE \`${dbName}\`;`);
+
   // 2. Read schema.sql
   const schemaPath = path.join(__dirname, 'schema.sql');
   const schemaSql = fs.readFileSync(schemaPath, 'utf8');
