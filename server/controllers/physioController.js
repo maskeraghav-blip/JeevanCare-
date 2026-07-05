@@ -98,7 +98,7 @@ exports.bookHomeVisit = async (req, res) => {
 exports.getAppointments = async (req, res) => {
   try {
     const [appointments] = await pool.query(
-      `SELECT hva.*, p.name AS doctor_name, p.specialization, p.photo_url
+      `SELECT hva.*, p.name AS doctor_name, p.specialization, p.photo_url, p.lat AS doctor_lat, p.lng AS doctor_lng
        FROM home_visit_appointments hva
        JOIN physiotherapists p ON hva.doctor_id = p.id
        WHERE hva.user_id = ? AND hva.doctor_type = 'physio'

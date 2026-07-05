@@ -233,7 +233,7 @@ JeevanCare+ Helpdesk Team
 exports.getAppointments = async (req, res) => {
   try {
     const [appointments] = await pool.query(
-      `SELECT ha.*, h.name AS hospital_name, h.address AS hospital_address, hd.name AS doctor_name, hd.specialization
+      `SELECT ha.*, h.name AS hospital_name, h.address AS hospital_address, h.lat AS hospital_lat, h.lng AS hospital_lng, hd.name AS doctor_name, hd.specialization
        FROM hospital_appointments ha
        JOIN hospitals h ON ha.hospital_id = h.id
        LEFT JOIN hospital_doctors hd ON ha.doctor_id = hd.id

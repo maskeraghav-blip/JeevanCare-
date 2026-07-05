@@ -202,6 +202,18 @@ export default function HospitalDetail() {
             )}
 
             {hospital.lat && hospital.lng && (
+              <a
+                href={`https://www.google.com/maps/dir/?api=1&destination=${hospital.lat},${hospital.lng}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-secondary"
+                style={{ width: '100%', marginTop: 'var(--space-3)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-2)' }}
+              >
+                📍 Get Directions
+              </a>
+            )}
+
+            {hospital.lat && hospital.lng && (
               <div style={{ marginTop: 'var(--space-6)', height: '220px', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
                 <GoogleMap locations={[hospital]} type="hospitals" />
               </div>

@@ -41,7 +41,7 @@
   height: 32px;
   border-radius: 50%;
   background: white;
-  color: #1b4332;
+  color: var(--color-primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -101,7 +101,7 @@
 /* Right Side: Login Form */
 .login-right-side {
   flex: 0.9;
-  background-color: #FAF8F5; /* Warm off-white beige */
+  background: linear-gradient(135deg, #e5f5f4 0%, #dcfce7 50%, #ecfeff 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -117,7 +117,12 @@
 
 .login-form-box {
   width: 100%;
-  max-width: 360px;
+  max-width: 400px;
+  background: var(--color-bg-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  box-shadow: var(--shadow-lg);
 }
 
 .login-welcome-tag {
@@ -184,8 +189,8 @@
 }
 
 .login-input-field:focus {
-  border-color: #1b4332;
-  box-shadow: 0 0 0 3px rgba(27, 67, 50, 0.08);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
 }
 
 .login-input-icon-btn {
@@ -205,19 +210,20 @@
 .login-submit-btn {
   width: 100%;
   padding: 14px;
-  background-color: #1e3f20; /* Dark forest green button */
+  background-color: var(--color-primary);
   color: white;
   border: none;
   border-radius: 8px;
   font-weight: 600;
   font-size: 0.95rem;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
   margin-top: 10px;
 }
 
 .login-submit-btn:hover {
-  background-color: #152d16;
+  background-color: var(--color-primary-dark);
+  box-shadow: var(--shadow-md);
 }
 
 .login-submit-btn:disabled {
@@ -235,7 +241,7 @@
 
 .login-signup-link {
   font-weight: 700;
-  color: #111827;
+  color: var(--color-primary);
   text-decoration: none;
 }
 

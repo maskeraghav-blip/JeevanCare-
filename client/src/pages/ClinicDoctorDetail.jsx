@@ -131,6 +131,19 @@ export default function ClinicDoctorDetail() {
                 <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
                   📍 {doctor.clinic_address}
                 </p>
+                {doctor.lat && doctor.lng && (
+                  <div style={{ marginTop: 'var(--space-2)' }}>
+                    <a
+                      href={`https://www.google.com/maps/dir/?api=1&destination=${doctor.lat},${doctor.lng}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-secondary btn-sm"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)' }}
+                    >
+                      📍 Get Directions
+                    </a>
+                  </div>
+                )}
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)', background: 'var(--color-bg)', padding: 'var(--space-4)', borderRadius: 'var(--radius-lg)' }}>

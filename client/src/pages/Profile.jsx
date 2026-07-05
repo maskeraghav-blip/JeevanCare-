@@ -214,7 +214,7 @@ export default function Profile() {
                 ) : (
                   <>
                     {appointments.map((a) => (
-                      <div key={`c-${a.id}`} className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div key={`c-${a.id}`} className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--space-4)' }}>
                         <div>
                           <span className="badge badge-primary" style={{ marginBottom: 'var(--space-2)' }}>Clinic Doctor Visit</span>
                           <h3 style={{ fontSize: 'var(--font-size-md)', fontWeight: 700 }}>{a.doctor_name}</h3>
@@ -225,14 +225,27 @@ export default function Profile() {
                             📍 {a.patient_address}
                           </p>
                         </div>
-                        <span className={`badge ${STATUS_COLORS[a.status] || 'badge-pending'}`}>
-                          {formatStatus(a.status)}
-                        </span>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 'var(--space-2)' }}>
+                          <span className={`badge ${STATUS_COLORS[a.status] || 'badge-pending'}`}>
+                            {formatStatus(a.status)}
+                          </span>
+                          {a.doctor_lat && a.doctor_lng && (
+                            <a
+                              href={`https://www.google.com/maps/dir/?api=1&destination=${a.doctor_lat},${a.doctor_lng}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="btn btn-secondary btn-sm"
+                              style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 8px', fontSize: '11px' }}
+                            >
+                              📍 Directions
+                            </a>
+                          )}
+                        </div>
                       </div>
                     ))}
 
                     {physioAppointments.map((p) => (
-                      <div key={`p-${p.id}`} className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div key={`p-${p.id}`} className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--space-4)' }}>
                         <div>
                           <span className="badge badge-primary" style={{ marginBottom: 'var(--space-2)', background: '#F1F5F9', color: '#475569' }}>
                             Physiotherapy Session
@@ -245,9 +258,22 @@ export default function Profile() {
                             📍 {p.patient_address}
                           </p>
                         </div>
-                        <span className={`badge ${STATUS_COLORS[p.status] || 'badge-pending'}`}>
-                          {formatStatus(p.status)}
-                        </span>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 'var(--space-2)' }}>
+                          <span className={`badge ${STATUS_COLORS[p.status] || 'badge-pending'}`}>
+                            {formatStatus(p.status)}
+                          </span>
+                          {p.doctor_lat && p.doctor_lng && (
+                            <a
+                              href={`https://www.google.com/maps/dir/?api=1&destination=${p.doctor_lat},${p.doctor_lng}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="btn btn-secondary btn-sm"
+                              style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 8px', fontSize: '11px' }}
+                            >
+                              📍 Directions
+                            </a>
+                          )}
+                        </div>
                       </div>
                     ))}
                   </>
@@ -261,7 +287,7 @@ export default function Profile() {
                   </div>
                 ) : (
                   hospitalAppointments.map((ha) => (
-                    <div key={ha.id} className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div key={ha.id} className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--space-4)' }}>
                       <div>
                         <span className="badge badge-primary" style={{ marginBottom: 'var(--space-2)', background: 'var(--color-primary-light)', color: 'white' }}>
                           Hospital Appointment
@@ -277,9 +303,22 @@ export default function Profile() {
                           Patient: {ha.patient_name} · Contact: {ha.patient_phone}
                         </p>
                       </div>
-                      <span className={`badge ${STATUS_COLORS[ha.status] || 'badge-pending'}`}>
-                        {formatStatus(ha.status)}
-                      </span>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 'var(--space-2)' }}>
+                        <span className={`badge ${STATUS_COLORS[ha.status] || 'badge-pending'}`}>
+                          {formatStatus(ha.status)}
+                        </span>
+                        {ha.hospital_lat && ha.hospital_lng && (
+                          <a
+                            href={`https://www.google.com/maps/dir/?api=1&destination=${ha.hospital_lat},${ha.hospital_lng}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-secondary btn-sm"
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 8px', fontSize: '11px' }}
+                          >
+                            📍 Directions
+                          </a>
+                        )}
+                      </div>
                     </div>
                   ))
                 )}
