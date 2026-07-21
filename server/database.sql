@@ -39,27 +39,30 @@ CREATE TABLE IF NOT EXISTS clinics (
 );
 
 CREATE TABLE IF NOT EXISTS patient_profiles (
-  id VARCHAR(36) PRIMARY KEY,
-  user_id VARCHAR(36) NOT NULL,
+  id VARCHAR(255) PRIMARY KEY,
+  user_id VARCHAR(255) NOT NULL,
   phone VARCHAR(20),
   address TEXT,
+  medical_history_doc VARCHAR(255),
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS doctor_profiles (
-  id VARCHAR(36) PRIMARY KEY,
-  user_id VARCHAR(36) NOT NULL,
+  id VARCHAR(255) PRIMARY KEY,
+  user_id VARCHAR(255) NOT NULL,
   specialty VARCHAR(100),
   hospital VARCHAR(255),
   is_clinic_doctor BOOLEAN DEFAULT FALSE,
+  verification_doc VARCHAR(255),
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS nurse_profiles (
-  id VARCHAR(36) PRIMARY KEY,
-  user_id VARCHAR(36) NOT NULL,
+  id VARCHAR(255) PRIMARY KEY,
+  user_id VARCHAR(255) NOT NULL,
   specialty VARCHAR(100),
-  experience VARCHAR(50),
+  experience VARCHAR(100),
+  verification_doc VARCHAR(255),
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 

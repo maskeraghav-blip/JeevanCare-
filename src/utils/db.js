@@ -20,6 +20,11 @@ async function fetchWithAuth(url, options = {}) {
     ...options.headers
   };
   
+  // If body is FormData, let the browser set the Content-Type with boundary
+  if (options.body instanceof FormData) {
+    delete headers['Content-Type'];
+  }
+  
   const response = await fetch(`${API_BASE}${url}`, { ...options, headers });
   if (!response.ok) {
     const error = await response.json();
@@ -30,18 +35,33 @@ async function fetchWithAuth(url, options = {}) {
 
 // Auth methods
 export async function register(userData) {
-  const data = await fetchWithAuth('/auth/register', {
-    method: 'POST',
-    body: JSON.stringify(userData)
-  });
-  localStorage.setItem(DB_KEY_TOKEN, data.token);
-  localStorage.setItem(DB_KEY_SESSION, JSON.stringify(data.user));
-  return data.user;
+  try {
+    let options = { method: 'POST' };
+
+    if (userData instanceof FormData) {
+      options.body = userData;
+      // Fetch automatically sets the correct multipart/form-data boundary when passing FormData
+    } else {
+      options.headers = { 'Content-Type': 'application/json' };
+      options.body = JSON.stringify(userData);
+    }
+
+    const data = await fetchWithAuth('/auth/register', options);
+    if (data.token) {
+      localStorage.setItem(DB_KEY_TOKEN, data.token);
+      localStorage.setItem(DB_KEY_SESSION, JSON.stringify(data.user));
+      return data.user;
+    }
+  } catch (error) {
+    throw error;
+  }
+  return null;
 }
 
 export async function loginApi(email, password) {
   const data = await fetchWithAuth('/auth/login', {
     method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password })
   });
   localStorage.setItem(DB_KEY_TOKEN, data.token);

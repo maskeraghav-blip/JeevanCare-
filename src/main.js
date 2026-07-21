@@ -13,7 +13,10 @@ import {
 } from './utils/helpers.js';
 import { 
   initDB, getCurrentUser, logout, 
-  getHospitals, getClinics, getDoctors, getNurses 
+  getHospitals, getClinics, getDoctors, getNurses,
+  hospitals, doctors, clinics, nurses, areas,
+  searchHospitals, searchDoctors, getDoctorsBySpecialty, searchClinics,
+  loadPublicData
 } from './utils/db.js';
 
 await loadPublicData();
@@ -49,32 +52,20 @@ function renderNavbar() {
     `;
   }
 
-  navbar.innerHTML = `
-    <div class="navbar-inner">
-      <div class="navbar-logo" onclick="location.hash='/'">
-        <div class="logo-icon"><i data-lucide="heart-pulse"></i></div>
-        <span>JeevanCare<span class="logo-plus">+</span></span>
-      </div>
-      <div class="navbar-links">
-        <a class="nav-link active" data-route="/" onclick="location.hash='/'">Home</a>
-        <a class="nav-link" data-route="/hospitals" onclick="location.hash='/hospitals'">Hospitals</a>
-        <a class="nav-link" data-route="/doctors" onclick="location.hash='/doctors'">Doctors</a>
-        <a class="nav-link" data-route="/clinics" onclick="location.hash='/clinics'">Clinics</a>
-        <a class="nav-link" data-route="/home-visit" onclick="location.hash='/home-visit'">Home Visit</a>
-        <a class="nav-link" data-route="/nursing" onclick="location.hash='/nursing'">Nursing</a>
-        <a class="nav-link" data-route="/services" onclick="location.hash='/services'">Services</a>
-        ${authLinks}
-      </div>
-      <div class="navbar-actions">
-        <button class="theme-toggle" id="theme-toggle" title="Toggle theme">
-          <i data-lucide="${currentTheme === 'dark' ? 'sun' : 'moon'}"></i>
-        </button>
-        <button class="mobile-menu-btn" id="mobile-menu-btn">
-          <i data-lucide="menu"></i>
-        </button>
-      </div>
-    </div>
-    <div class="mobile-nav" id="mobile-nav">
+  let navLinksHtml = '';
+  let mobileNavLinksHtml = '';
+  
+  if (!user || user.role === 'patient') {
+    navLinksHtml = `
+      <a class="nav-link active" data-route="/" onclick="location.hash='/'">Home</a>
+      <a class="nav-link" data-route="/hospitals" onclick="location.hash='/hospitals'">Hospitals</a>
+      <a class="nav-link" data-route="/doctors" onclick="location.hash='/doctors'">Doctors</a>
+      <a class="nav-link" data-route="/clinics" onclick="location.hash='/clinics'">Clinics</a>
+      <a class="nav-link" data-route="/home-visit" onclick="location.hash='/home-visit'">Home Visit</a>
+      <a class="nav-link" data-route="/nursing" onclick="location.hash='/nursing'">Nursing</a>
+      <a class="nav-link" data-route="/services" onclick="location.hash='/services'">Services</a>
+    `;
+    mobileNavLinksHtml = `
       <a class="nav-link" onclick="closeMobileNav();location.hash='/'">🏠 Home</a>
       <a class="nav-link" onclick="closeMobileNav();location.hash='/hospitals'">🏥 Hospitals</a>
       <a class="nav-link" onclick="closeMobileNav();location.hash='/doctors'">👨‍⚕️ Doctors</a>
@@ -82,6 +73,30 @@ function renderNavbar() {
       <a class="nav-link" onclick="closeMobileNav();location.hash='/home-visit'">🏠 Home Visit</a>
       <a class="nav-link" onclick="closeMobileNav();location.hash='/nursing'">🩺 Nursing</a>
       <a class="nav-link" onclick="closeMobileNav();location.hash='/services'">⚕️ Services</a>
+    `;
+  }
+
+  navbar.innerHTML = `
+    <div class="navbar-inner">
+      <div class="navbar-logo" onclick="location.hash='/'">
+        <div class="logo-icon"><i data-lucide="heart-pulse"></i></div>
+        <span>JeevanCare<span class="logo-plus">+</span></span>
+      </div>
+      <div class="navbar-links">
+        ${navLinksHtml}
+        ${authLinks}
+      </div>
+      <div class="navbar-actions">
+        <button class="theme-toggle" id="theme-toggle" title="Toggle theme">
+          <i data-lucide="\${currentTheme === 'dark' ? 'sun' : 'moon'}"></i>
+        </button>
+        <button class="mobile-menu-btn" id="mobile-menu-btn">
+          <i data-lucide="menu"></i>
+        </button>
+      </div>
+    </div>
+    <div class="mobile-nav" id="mobile-nav">
+      ${mobileNavLinksHtml}
       ${mobileAuthLinks}
     </div>
   `;
@@ -114,7 +129,12 @@ window.handleLogout = () => {
   location.hash = '/';
 };
 
-window.openBookingModal = (providerId, providerName, providerRole, type) => {
+function renderBookingPage() {
+  const parts = window.location.hash.split('/');
+  const providerId = parts[2];
+  const providerRole = parts[3];
+  const type = parts[4];
+
   const user = getCurrentUser();
   if (!user || user.role !== 'patient') {
     alert('Please login as a Patient to book an appointment.');
@@ -125,71 +145,86 @@ window.openBookingModal = (providerId, providerName, providerRole, type) => {
   const isHospital = type === 'hospital';
   let hospital = null;
   let hospitalDocs = [];
-  if (isHospital) {
+  let providerName = '';
+
+  if (providerRole === 'doctor') {
+    const doc = window.doctors && window.doctors.find(d => d.id === providerId);
+    providerName = doc ? doc.name : 'Doctor';
+  } else if (providerRole === 'nurse') {
+    const nurse = window.nurses && window.nurses.find(n => n.id === providerId);
+    providerName = nurse ? nurse.name : 'Nurse';
+  } else if (providerRole === 'hospital') {
     hospital = (window.hospitals && window.hospitals.find(h => h.id === providerId)) || 
                (window.clinics && window.clinics.find(c => c.id === providerId));
+    providerName = hospital ? hospital.name : 'Hospital';
     if (hospital && window.doctors) {
       hospitalDocs = window.doctors.filter(d => d.hospital && d.hospital.toLowerCase().includes(hospital.name.toLowerCase().split(' ')[0]));
     }
   }
 
-  const modal = document.getElementById('modal-overlay');
-  modal.innerHTML = `
-    <div class="modal-content card" style="max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; position: relative;">
-      <button class="btn-close" onclick="document.getElementById('modal-overlay').classList.add('hidden')" style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 24px; cursor: pointer;">&times;</button>
-      <h2 style="margin-bottom: 16px;">Book ${isHospital ? 'Hospital Visit' : type === 'nursing' ? 'Nurse' : 'Appointment'}</h2>
-      <p style="margin-bottom: 24px; color: var(--text-secondary);">Booking with <strong>${providerName}</strong></p>
-      
-      <form id="booking-form" style="display: flex; flex-direction: column; gap: 16px;">
-        <div style="display: flex; gap: 16px;">
-          <div style="flex: 1;">
-            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Patient Name</label>
-            <input type="text" id="b-name" required value="${user.name}" style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border);" />
-          </div>
-          <div style="flex: 1;">
-            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Contact Number</label>
-            <input type="tel" id="b-phone" required value="${user.phone || ''}" style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border);" />
-          </div>
-        </div>
-        <div>
-          <label style="display: block; margin-bottom: 8px; font-weight: 500;">Date</label>
-          <input type="date" id="b-date" required style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border);" />
-        </div>
-        <div>
-          <label style="display: block; margin-bottom: 8px; font-weight: 500;">Time</label>
-          <input type="time" id="b-time" required style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border);" />
-        </div>
-        ${isHospital ? `
-          <div>
-            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Department</label>
-            <select id="b-dept" required style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border);">
-              <option value="">Select Department</option>
-              ${hospital && hospital.specialties ? hospital.specialties.map(s => `<option value="${s}">${s}</option>`).join('') : '<option value="General">General</option>'}
-            </select>
+  const main = document.getElementById('main-content');
+  main.innerHTML = `
+    <div class="container" style="padding-top: var(--space-2xl); padding-bottom: var(--space-4xl);">
+      <button class="btn btn-secondary btn-sm" onclick="history.back()" style="margin-bottom:24px;"><i data-lucide="arrow-left" style="width:16px;"></i> Back</button>
+      <div class="card" style="max-width: 600px; margin: 0 auto; padding: var(--space-xl);">
+        <h2 style="margin-bottom: 16px;">Book ${isHospital ? 'Hospital Visit' : type === 'nursing' ? 'Nurse' : 'Appointment'}</h2>
+        <p style="margin-bottom: 24px; color: var(--text-secondary);">Booking with <strong>${providerName}</strong></p>
+        
+        <form id="booking-form" style="display: flex; flex-direction: column; gap: 16px;">
+          <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 200px;">
+              <label style="display: block; margin-bottom: 8px; font-weight: 500;">Patient Name</label>
+              <input type="text" id="b-name" required value="${user.name}" style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border);" />
+            </div>
+            <div style="flex: 1; min-width: 200px;">
+              <label style="display: block; margin-bottom: 8px; font-weight: 500;">Contact Number</label>
+              <input type="tel" id="b-phone" required value="${user.phone || ''}" style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border);" />
+            </div>
           </div>
           <div>
-            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Doctor (Optional)</label>
-            <select id="b-doc" style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border);">
-              <option value="">Any Available Doctor</option>
-              ${hospitalDocs.map(d => `<option value="${d.id}">${d.name} - ${d.specialty}</option>`).join('')}
-            </select>
+            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Date</label>
+            <input type="date" id="b-date" required style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border);" />
           </div>
-        ` : `
           <div>
-            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Address</label>
-            <input type="text" id="b-address" required placeholder="Enter your full address" style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border);" />
+            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Time</label>
+            <input type="time" id="b-time" required style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border);" />
           </div>
-        `}
-        <div>
-          <label style="display: block; margin-bottom: 8px; font-weight: 500;">Reason / Notes</label>
-          <textarea id="b-notes" rows="3" placeholder="Any specific requirements or symptoms?" style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border);"></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary" style="margin-top: 16px;">Confirm Booking</button>
-      </form>
+          ${isHospital ? `
+            <div>
+              <label style="display: block; margin-bottom: 8px; font-weight: 500;">Department</label>
+              <select id="b-dept" required style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border);">
+                <option value="">Select Department</option>
+                ${hospital && hospital.specialties ? hospital.specialties.map(s => `<option value="${s}">${s}</option>`).join('') : '<option value="General">General</option>'}
+              </select>
+            </div>
+            <div>
+              <label style="display: block; margin-bottom: 8px; font-weight: 500;">Doctor (Optional)</label>
+              <select id="b-doc" style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border);">
+                <option value="">Any Available Doctor</option>
+                ${hospitalDocs.map(d => `<option value="${d.id}">${d.name} - ${d.specialty}</option>`).join('')}
+              </select>
+            </div>
+          ` : type === 'clinic-visit' ? `
+            <div>
+              <label style="display: block; margin-bottom: 8px; font-weight: 500;">Clinic Location</label>
+              <input type="text" id="b-address" disabled value="Doctor's Clinic / Hospital" style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-secondary); border: 1px solid var(--border);" />
+            </div>
+          ` : `
+            <div>
+              <label style="display: block; margin-bottom: 8px; font-weight: 500;">Your Address (For Home Visit/Nursing)</label>
+              <input type="text" id="b-address" required placeholder="Enter your full address" style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border);" />
+            </div>
+          `}
+          <div>
+            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Reason / Notes</label>
+            <textarea id="b-notes" rows="3" placeholder="Any specific requirements or symptoms?" style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border);"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" style="margin-top: 16px;">Confirm Booking</button>
+        </form>
+      </div>
     </div>
   `;
-  modal.classList.remove('hidden');
-  modal.style.display = 'flex';
+  if (window.lucide) lucide.createIcons();
   
   document.getElementById('booking-form').addEventListener('submit', (e) => {
     e.preventDefault();
@@ -217,11 +252,10 @@ window.openBookingModal = (providerId, providerName, providerRole, type) => {
           notes: notesText,
           status: isHospital ? 'pending' : 'new'
         });
-        modal.classList.add('hidden');
         if (isHospital) {
           alert('Your request has been sent. Please call the hospital to confirm your slot.');
         } else {
-          alert('Booking confirmed! It is now pending provider acceptance.');
+          alert('Booking confirmed! It is now pending provider acceptance. You can check the status on your dashboard.');
         }
         location.hash = '/patient-dashboard';
       } catch (err) {
@@ -229,7 +263,7 @@ window.openBookingModal = (providerId, providerName, providerRole, type) => {
       }
     });
   });
-};
+}
 
 // ===== FOOTER =====
 function renderFooter() {
@@ -1030,7 +1064,7 @@ function renderHospitalProfile(id) {
               <div style="font-size:24px;font-weight:bold;color:var(--warning);">★ ${hospital.rating}</div>
               <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top:12px;">
                 <a class="btn btn-secondary btn-sm" href="${getDirectionsUrl(hospital.lat, hospital.lng)}" target="_blank"><i data-lucide="navigation" style="width:16px;"></i> Directions</a>
-                <button class="btn btn-primary btn-sm" onclick="window.openBookingModal('${hospital.id}', '${hospital.name.replace(/'/g, "\\'")}', 'hospital', 'hospital')"><i data-lucide="calendar" style="width:16px;"></i> Book Appointment</button>
+                <button class="btn btn-primary btn-sm" onclick="location.hash='/book/${hospital.id}/hospital/hospital'"><i data-lucide="calendar" style="width:16px;"></i> Book Appointment</button>
               </div>
             </div>
           </div>
@@ -1089,7 +1123,7 @@ function renderDoctorProfile(id) {
               ${doc.verified ? `<div style="display:flex;align-items:center;gap:6px;color:#10B981;font-weight:600;justify-content:flex-end;margin-bottom:8px;"><i data-lucide="shield-check"></i> Verified Profile</div><div style="font-size:12px;color:var(--text-muted);">Reg: ${doc.registration}</div>` : ''}
               ${doc.isClinicDoctor ? `<div class="badge" style="margin-top:12px;background:#ECFDF5;color:#059669;">🏠 Home Visit Available</div>` : ''}
               <div style="margin-top:24px;">
-                <button class="btn btn-primary btn-lg" onclick="window.openBookingModal('${doc.id}', '${doc.name}', 'doctor', '${doc.isClinicDoctor ? 'home-visit' : 'clinic-visit'}')">Book Appointment</button>
+                <button class="btn btn-primary btn-lg" onclick="location.hash='/book/${doc.id}/doctor/${doc.isClinicDoctor ? 'home-visit' : 'clinic-visit'}'">Book Appointment</button>
               </div>
             </div>
           </div>
@@ -1125,7 +1159,7 @@ function renderNurseProfile(id) {
             <div style="text-align:right;">
               ${nurse.verified ? `<div style="display:flex;align-items:center;gap:6px;color:#10B981;font-weight:600;justify-content:flex-end;margin-bottom:8px;"><i data-lucide="shield-check"></i> Verified Nurse</div><div style="font-size:12px;color:var(--text-muted);">Reg: ${nurse.registration}</div>` : ''}
               <div style="margin-top:24px;">
-                <button class="btn btn-primary btn-lg" onclick="window.openBookingModal('${nurse.id}', '${nurse.name}', 'nurse', 'nursing')">Request Nurse</button>
+                <button class="btn btn-primary btn-lg" onclick="location.hash='/book/${nurse.id}/nurse/nursing'">Request Nurse</button>
               </div>
             </div>
           </div>
@@ -1205,8 +1239,15 @@ function renderServices() {
 // ===== PAGE: LOGIN =====
 function renderLogin() {
   const main = document.getElementById('main-content');
-  import('./utils/db.js').then(({ loginApi, register }) => {
+  import('./utils/db.js').then(({ loginApi, register, getCurrentUser }) => {
     
+    const user = getCurrentUser();
+    if (user) {
+      const dashRoute = user.role === 'patient' ? '/patient-dashboard' : user.role === 'nurse' ? '/nurse-dashboard' : '/doctor-dashboard';
+      location.hash = dashRoute;
+      return;
+    }
+
     window.handleAuthForm = async (e, type) => {
       e.preventDefault();
       try {
@@ -1215,22 +1256,32 @@ function renderLogin() {
           const password = document.getElementById('login-password').value;
           const user = await loginApi(email, password);
           if (user) {
-            import('./main.js').then(m => window.location.reload());
+            const dashRoute = user.role === 'patient' ? '/patient-dashboard' : user.role === 'nurse' ? '/nurse-dashboard' : '/doctor-dashboard';
+            window.location.href = '#' + dashRoute;
+            window.location.reload();
           }
         } else {
           const role = document.getElementById('reg-role').value;
-          const userData = {
-            email: document.getElementById('reg-email').value,
-            password: document.getElementById('reg-password').value,
-            name: document.getElementById('reg-name').value,
-            role: role,
-            phone: document.getElementById('reg-phone') ? document.getElementById('reg-phone').value : undefined,
-            specialty: document.getElementById('reg-specialty') ? document.getElementById('reg-specialty').value : undefined,
-            hospital: document.getElementById('reg-hospital') ? document.getElementById('reg-hospital').value : undefined,
-            experience: document.getElementById('reg-experience') ? document.getElementById('reg-experience').value : undefined
-          };
-          const user = await register(userData);
+          const formData = new FormData();
+          formData.append('role', role);
+          formData.append('email', document.getElementById('reg-email').value);
+          formData.append('password', document.getElementById('reg-password').value);
+          formData.append('name', document.getElementById('reg-name').value);
+          
+          if (document.getElementById('reg-phone')) formData.append('phone', document.getElementById('reg-phone').value);
+          if (document.getElementById('reg-specialty')) formData.append('specialty', document.getElementById('reg-specialty').value);
+          if (document.getElementById('reg-hospital')) formData.append('hospital', document.getElementById('reg-hospital').value);
+          if (document.getElementById('reg-experience')) formData.append('experience', document.getElementById('reg-experience').value);
+          
+          const fileInput = document.getElementById('reg-document');
+          if (fileInput && fileInput.files.length > 0) {
+            formData.append('document', fileInput.files[0]);
+          }
+
+          const user = await register(formData);
           if (user) {
+             const dashRoute = user.role === 'patient' ? '/patient-dashboard' : user.role === 'nurse' ? '/nurse-dashboard' : '/doctor-dashboard';
+             window.location.href = '#' + dashRoute;
              window.location.reload();
           }
         }
@@ -1260,6 +1311,17 @@ function renderLogin() {
           <input type="text" id="reg-experience" placeholder="Experience (e.g. 5 Years)" class="form-control" required />
         `;
       }
+      
+      // Document upload field
+      let docLabel = role === 'patient' ? 'Upload Medical History (Optional)' : 'Upload Verification Document (Required)';
+      let isRequired = role !== 'patient' ? 'required' : '';
+      fields += `
+        <div style="text-align:left; margin-top: 8px;">
+          <label style="display:block; margin-bottom:4px; font-weight:500; font-size:14px; color:var(--text-secondary);">${docLabel}</label>
+          <input type="file" id="reg-document" accept=".pdf,image/png,image/jpeg" class="form-control" ${isRequired} />
+        </div>
+      `;
+      
       document.getElementById('reg-dynamic-fields').innerHTML = fields;
     };
 
@@ -1296,6 +1358,10 @@ function renderLogin() {
               <input type="password" id="reg-password" placeholder="Password" class="form-control" required />
               <div id="reg-dynamic-fields" style="display:flex; flex-direction:column; gap:16px;">
                 <input type="tel" id="reg-phone" placeholder="Phone Number" class="form-control" required />
+                <div style="text-align:left; margin-top: 8px;">
+                  <label style="display:block; margin-bottom:4px; font-weight:500; font-size:14px; color:var(--text-secondary);">Upload Medical History (Optional)</label>
+                  <input type="file" id="reg-document" accept=".pdf,image/png,image/jpeg" class="form-control" />
+                </div>
               </div>
               <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">Register</button>
             </form>
@@ -1343,6 +1409,23 @@ function renderPatientDashboard() {
               `).join('')}
             </div>
           `}
+
+          <h2 style="margin-top: var(--space-2xl); margin-bottom: var(--space-xl);">Available Doctors</h2>
+          <div class="grid grid-3">
+            ${(window.doctors || []).length === 0 ? '<p style="color:var(--text-secondary); grid-column:1/-1;">No doctors currently available.</p>' : 
+              (window.doctors || []).slice(0, 6).map(doc => `
+                <div class="card hover-lift" onclick="location.hash='/doctor/${doc.id}'" style="cursor:pointer; display:flex; flex-direction:column; align-items:center; text-align:center;">
+                  <div style="width:64px; height:64px; border-radius:50%; background:var(--surface-active); display:flex; align-items:center; justify-content:center; margin-bottom:12px;">
+                    <i data-lucide="user" style="width:32px; height:32px; color:var(--primary);"></i>
+                  </div>
+                  <h3 style="margin-bottom:4px; font-size:16px;">${doc.name}</h3>
+                  <div style="color:var(--text-secondary); font-size:14px; margin-bottom:8px;">${doc.specialty}</div>
+                  <div class="badge badge-private" style="font-size:12px;">${doc.hospital}</div>
+                </div>
+              `).join('')}
+          </div>
+          ${(window.doctors || []).length > 6 ? `<div style="text-align:center; margin-top:16px;"><button class="btn btn-secondary" onclick="location.hash='/doctors'">View All Doctors</button></div>` : ''}
+
         </div>
       `;
       if (window.lucide) lucide.createIcons();
@@ -1527,6 +1610,7 @@ function renderNurseDashboard() {
 }
 
 // ===== REGISTER ROUTES =====
+router.addRoute('/book', renderBookingPage);
 router.addRoute('/hospital', renderHospitalProfile);
 router.addRoute('/doctor', renderDoctorProfile);
 router.addRoute('/nurse', renderNurseProfile);
@@ -1543,7 +1627,7 @@ router.addRoute('/doctor-dashboard', renderDoctorDashboard);
 router.addRoute('/nurse-dashboard', renderNurseDashboard);
 
 // ===== INITIALIZE =====
-document.addEventListener('DOMContentLoaded', () => {
+function initializeApp() {
   renderNavbar();
   renderFooter();
   router.init();
@@ -1551,10 +1635,18 @@ document.addEventListener('DOMContentLoaded', () => {
   // Hide loading screen
   setTimeout(() => {
     const loader = document.getElementById('loading-screen');
-    loader.classList.add('fade-out');
-    setTimeout(() => loader.remove(), 500);
-  }, 1500);
+    if (loader) {
+      loader.classList.add('fade-out');
+      setTimeout(() => loader.remove(), 500);
+    }
+  }, 500); // reduced timeout to make it feel faster
 
   // Initialize Lucide icons
   if (window.lucide) lucide.createIcons();
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeApp);
+} else {
+  initializeApp();
+}

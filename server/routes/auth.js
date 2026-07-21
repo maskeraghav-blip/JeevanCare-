@@ -5,14 +5,28 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const db = require('../config/db');
 const dotenv = require('dotenv');
+const multer = require('multer');
+const path = require('path');
 
 dotenv.config();
+
+// Configure multer
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, '../uploads/'));
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+const upload = multer({ storage: storage });
 
 // Helper to generate UUID
 const generateId = () => crypto.randomUUID();
 
 // @route   POST /api/auth/register
-router.post('/register', async (req, res) => {
+router.post('/register', upload.single('document'), async (req, res) => {
   const { email, password, role, name, phone, address, specialty, hospital, isClinicDoctor, experience } = req.body;
 
   try {
@@ -35,20 +49,22 @@ router.post('/register', async (req, res) => {
 
     // 4. Create profile based on role
     const profileId = generateId();
+    const docPath = req.file ? '/uploads/' + req.file.filename : null;
+
     if (role === 'patient') {
       await db.query(
-        'INSERT INTO patient_profiles (id, user_id, phone, address) VALUES (?, ?, ?, ?)',
-        [profileId, userId, phone || null, address || null]
+        'INSERT INTO patient_profiles (id, user_id, phone, address, medical_history_doc) VALUES (?, ?, ?, ?, ?)',
+        [profileId, userId, phone || null, address || null, docPath]
       );
     } else if (role === 'doctor' || role === 'physio') {
       await db.query(
-        'INSERT INTO doctor_profiles (id, user_id, specialty, hospital, is_clinic_doctor) VALUES (?, ?, ?, ?, ?)',
-        [profileId, userId, specialty || null, hospital || null, isClinicDoctor ? 1 : 0]
+        'INSERT INTO doctor_profiles (id, user_id, specialty, hospital, is_clinic_doctor, verification_doc) VALUES (?, ?, ?, ?, ?, ?)',
+        [profileId, userId, specialty || null, hospital || null, isClinicDoctor === 'true' || isClinicDoctor === true ? 1 : 0, docPath]
       );
     } else if (role === 'nurse') {
       await db.query(
-        'INSERT INTO nurse_profiles (id, user_id, specialty, experience) VALUES (?, ?, ?, ?)',
-        [profileId, userId, specialty || null, experience || null]
+        'INSERT INTO nurse_profiles (id, user_id, specialty, experience, verification_doc) VALUES (?, ?, ?, ?, ?)',
+        [profileId, userId, specialty || null, experience || null, docPath]
       );
     }
 
