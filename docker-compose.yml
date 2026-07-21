@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: jeevancare-db
+    restart: always
+    environment:
+      MYSQL_DATABASE: jeevancare_db
+      MYSQL_ROOT_PASSWORD: Shaurya@1234
+    ports:
+      - "3307:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./server/db/schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
+
+  backend:
+    build: ./server
+    container_name: jeevancare-backend
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      DB_HOST: db
+      DB_USER: root
+      DB_PASSWORD: Shaurya@1234
+      DB_NAME: jeevancare_db
+      DB_PORT: 3306
+      JWT_SECRET: jeevancare_dev_secret_key_2024
+      JWT_EXPIRES_IN: 7d
+      PORT: 5000
+      NODE_ENV: development
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./client
+      args:
+        - VITE_API_URL=http://localhost:5000/api
+    container_name: jeevancare-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  db-data:
