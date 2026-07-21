@@ -170,56 +170,60 @@ function renderBookingPage() {
         <h2 style="margin-bottom: 16px;">Book ${isHospital ? 'Hospital Visit' : type === 'nursing' ? 'Nurse' : 'Appointment'}</h2>
         <p style="margin-bottom: 24px; color: var(--text-secondary);">Booking with <strong>${providerName}</strong></p>
         
-        <form id="booking-form" style="display: flex; flex-direction: column; gap: 16px;">
-          <div style="display: flex; gap: 16px; flex-wrap: wrap;">
-            <div style="flex: 1; min-width: 200px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: 500;">Patient Name</label>
-              <input type="text" id="b-name" required value="${user.name}" style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border);" />
+        <form id="booking-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="b-name">Patient Name</label>
+              <input type="text" id="b-name" required value="${user.name}" class="form-control" />
             </div>
-            <div style="flex: 1; min-width: 200px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: 500;">Contact Number</label>
-              <input type="tel" id="b-phone" required value="${user.phone || ''}" style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border);" />
+            <div class="form-group">
+              <label class="form-label" for="b-phone">Contact Number</label>
+              <input type="tel" id="b-phone" required value="${user.phone || ''}" class="form-control" />
             </div>
           </div>
-          <div>
-            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Date</label>
-            <input type="date" id="b-date" required style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border);" />
-          </div>
-          <div>
-            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Time</label>
-            <input type="time" id="b-time" required style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border);" />
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="b-date">Date</label>
+              <input type="date" id="b-date" required class="form-control" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="b-time">Time</label>
+              <input type="time" id="b-time" required class="form-control" />
+            </div>
           </div>
           ${isHospital ? `
-            <div>
-              <label style="display: block; margin-bottom: 8px; font-weight: 500;">Department</label>
-              <select id="b-dept" required style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border);">
-                <option value="">Select Department</option>
-                ${hospital && hospital.specialties ? hospital.specialties.map(s => `<option value="${s}">${s}</option>`).join('') : '<option value="General">General</option>'}
-              </select>
-            </div>
-            <div>
-              <label style="display: block; margin-bottom: 8px; font-weight: 500;">Doctor (Optional)</label>
-              <select id="b-doc" style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border);">
-                <option value="">Any Available Doctor</option>
-                ${hospitalDocs.map(d => `<option value="${d.id}">${d.name} - ${d.specialty}</option>`).join('')}
-              </select>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="b-dept">Department</label>
+                <select id="b-dept" required class="form-control">
+                  <option value="">Select Department</option>
+                  ${hospital && hospital.specialties ? hospital.specialties.map(s => `<option value="${s}">${s}</option>`).join('') : '<option value="General">General</option>'}
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="b-doc">Doctor (Optional)</label>
+                <select id="b-doc" class="form-control">
+                  <option value="">Any Available Doctor</option>
+                  ${hospitalDocs.map(d => `<option value="${d.id}">${d.name} - ${d.specialty}</option>`).join('')}
+                </select>
+              </div>
             </div>
           ` : type === 'clinic-visit' ? `
-            <div>
-              <label style="display: block; margin-bottom: 8px; font-weight: 500;">Clinic Location</label>
-              <input type="text" id="b-address" disabled value="Doctor's Clinic / Hospital" style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-secondary); border: 1px solid var(--border);" />
+            <div class="form-group">
+              <label class="form-label" for="b-address">Clinic Location</label>
+              <input type="text" id="b-address" disabled value="Doctor's Clinic / Hospital" class="form-control" style="background: var(--bg-secondary);" />
             </div>
           ` : `
-            <div>
-              <label style="display: block; margin-bottom: 8px; font-weight: 500;">Your Address (For Home Visit/Nursing)</label>
-              <input type="text" id="b-address" required placeholder="Enter your full address" style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border);" />
+            <div class="form-group">
+              <label class="form-label" for="b-address">Your Address (For Home Visit/Nursing)</label>
+              <input type="text" id="b-address" required placeholder="Enter your full address" class="form-control" />
             </div>
           `}
-          <div>
-            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Reason / Notes</label>
-            <textarea id="b-notes" rows="3" placeholder="Any specific requirements or symptoms?" style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border);"></textarea>
+          <div class="form-group">
+            <label class="form-label" for="b-notes">Reason / Notes</label>
+            <textarea id="b-notes" rows="3" placeholder="Any specific requirements or symptoms?" class="form-control"></textarea>
           </div>
-          <button type="submit" class="btn btn-primary" style="margin-top: 16px;">Confirm Booking</button>
+          <button type="submit" class="btn btn-primary" style="margin-top: 8px;">Confirm Booking</button>
         </form>
       </div>
     </div>
@@ -862,7 +866,9 @@ function renderDoctors() {
       <div class="card doctor-card hover-lift" style="display:flex;gap:var(--space-md);align-items:flex-start;">
         <div class="doctor-avatar">${getInitials(d.name)}</div>
         <div class="doctor-info">
-          <div class="doctor-name">${d.name}</div>
+          <div class="doctor-name" style="display:flex; align-items:center; gap:4px;">
+            ${d.name} <i data-lucide="badge-check" style="width:16px;height:16px;color:var(--primary);" title="Verified Professional"></i>
+          </div>
           <div class="doctor-specialty">${specialtyData.find(s => s.name === d.specialty)?.icon || '🩺'} ${d.specialty}</div>
           <div class="doctor-details">${d.hospital} • ${d.city}</div>
           <span class="doctor-experience">⏱ ${d.experience}</span>
@@ -987,7 +993,7 @@ function renderHomeVisitDoctors() {
     <div class="card doctor-card hover-lift" style="display:flex;gap:var(--space-md);align-items:flex-start;">
       <div class="doctor-avatar">${getInitials(d.name)}</div>
       <div class="doctor-info" style="flex:1;">
-        <div class="doctor-name">${d.name}</div>
+        <div class="doctor-name" style="display:flex; align-items:center; gap:4px;">${d.name} ${d.verified ? '<i data-lucide="badge-check" style="width:16px;height:16px;color:var(--primary);" title="Verified Professional"></i>' : ''}</div>
         <div class="doctor-specialty">${d.specialty} • ${d.hospital}</div>
         <span class="badge" style="background:#ECFDF5;color:#059669;margin-top:8px;">🏠 Home Visit Available</span>
         <div style="margin-top:12px;">
@@ -1084,7 +1090,7 @@ function renderHospitalProfile(id) {
               <div style="display:flex;gap:16px;">
                 <div class="doctor-avatar">${getInitials(d.name)}</div>
                 <div>
-                  <div class="doctor-name">${d.name}</div>
+                  <div class="doctor-name" style="display:flex; align-items:center; gap:4px;">${d.name} <i data-lucide="badge-check" style="width:16px;height:16px;color:var(--primary);" title="Verified Professional"></i></div>
                   <div class="doctor-specialty">${d.specialty}</div>
                   <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">${d.experience}</div>
                 </div>
@@ -1243,7 +1249,7 @@ function renderLogin() {
     
     const user = getCurrentUser();
     if (user) {
-      const dashRoute = user.role === 'patient' ? '/patient-dashboard' : user.role === 'nurse' ? '/nurse-dashboard' : '/doctor-dashboard';
+      const dashRoute = user.role === 'admin' ? '/admin-dashboard' : user.role === 'patient' ? '/patient-dashboard' : user.role === 'nurse' ? '/nurse-dashboard' : '/doctor-dashboard';
       location.hash = dashRoute;
       return;
     }
@@ -1256,7 +1262,7 @@ function renderLogin() {
           const password = document.getElementById('login-password').value;
           const user = await loginApi(email, password);
           if (user) {
-            const dashRoute = user.role === 'patient' ? '/patient-dashboard' : user.role === 'nurse' ? '/nurse-dashboard' : '/doctor-dashboard';
+            const dashRoute = user.role === 'admin' ? '/admin-dashboard' : user.role === 'patient' ? '/patient-dashboard' : user.role === 'nurse' ? '/nurse-dashboard' : '/doctor-dashboard';
             window.location.href = '#' + dashRoute;
             window.location.reload();
           }
@@ -1268,19 +1274,20 @@ function renderLogin() {
           formData.append('password', document.getElementById('reg-password').value);
           formData.append('name', document.getElementById('reg-name').value);
           
-          if (document.getElementById('reg-phone')) formData.append('phone', document.getElementById('reg-phone').value);
-          if (document.getElementById('reg-specialty')) formData.append('specialty', document.getElementById('reg-specialty').value);
-          if (document.getElementById('reg-hospital')) formData.append('hospital', document.getElementById('reg-hospital').value);
-          if (document.getElementById('reg-experience')) formData.append('experience', document.getElementById('reg-experience').value);
+          if (document.getElementById('reg-dob')) formData.append('dob', document.getElementById('reg-dob').value);
+          if (document.getElementById('reg-gender')) formData.append('gender', document.getElementById('reg-gender').value);
+          if (document.getElementById('reg-phone')) formData.append('mobile_number', document.getElementById('reg-phone').value);
+          
+          if (document.getElementById('reg-address')) formData.append('residential_address', document.getElementById('reg-address').value);
           
           const fileInput = document.getElementById('reg-document');
           if (fileInput && fileInput.files.length > 0) {
-            formData.append('document', fileInput.files[0]);
+            formData.append('profile_photo', fileInput.files[0]);
           }
 
-          const user = await register(formData);
+          const user = await register(formData, role);
           if (user) {
-             const dashRoute = user.role === 'patient' ? '/patient-dashboard' : user.role === 'nurse' ? '/nurse-dashboard' : '/doctor-dashboard';
+             const dashRoute = user.role === 'admin' ? '/admin-dashboard' : user.role === 'patient' ? '/patient-dashboard' : user.role === 'nurse' ? '/nurse-dashboard' : '/doctor-dashboard';
              window.location.href = '#' + dashRoute;
              window.location.reload();
           }
@@ -1297,30 +1304,53 @@ function renderLogin() {
 
     window.updateRegFields = () => {
       const role = document.getElementById('reg-role').value;
-      let fields = '';
-      if (role === 'patient') {
-        fields = `<input type="tel" id="reg-phone" placeholder="Phone Number" class="form-control" required />`;
-      } else if (role === 'doctor' || role === 'physio') {
-        fields = `
-          <input type="text" id="reg-specialty" placeholder="Specialty" class="form-control" required />
-          <input type="text" id="reg-hospital" placeholder="Hospital/Clinic" class="form-control" required />
-        `;
-      } else if (role === 'nurse') {
-        fields = `
-          <input type="text" id="reg-specialty" placeholder="Specialty (e.g. Registered Nurse)" class="form-control" required />
-          <input type="text" id="reg-experience" placeholder="Experience (e.g. 5 Years)" class="form-control" required />
-        `;
-      }
-      
-      // Document upload field
-      let docLabel = role === 'patient' ? 'Upload Medical History (Optional)' : 'Upload Verification Document (Required)';
-      let isRequired = role !== 'patient' ? 'required' : '';
-      fields += `
-        <div style="text-align:left; margin-top: 8px;">
-          <label style="display:block; margin-bottom:4px; font-weight:500; font-size:14px; color:var(--text-secondary);">${docLabel}</label>
-          <input type="file" id="reg-document" accept=".pdf,image/png,image/jpeg" class="form-control" ${isRequired} />
+      let fields = `
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="reg-dob">Date of Birth</label>
+            <input type="date" id="reg-dob" class="form-control" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-gender">Gender</label>
+            <select id="reg-gender" class="form-control" required>
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="reg-phone">Mobile Number</label>
+          <input type="tel" id="reg-phone" placeholder="Enter mobile number for OTP" class="form-control" required />
         </div>
       `;
+      
+      if (role === 'patient') {
+        fields += `
+          <div class="form-group">
+            <label class="form-label" for="reg-address">Residential Address</label>
+            <input type="text" id="reg-address" placeholder="Full residential address" class="form-control" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-document">Medical History</label>
+            <input type="file" id="reg-document" accept=".pdf,image/png,image/jpeg" class="form-control" />
+            <span class="form-help">Upload PDF or Image (Optional)</span>
+          </div>
+        `;
+      } else {
+        fields += `
+          <div class="form-group">
+            <label class="form-label" for="reg-address">Residential Address</label>
+            <input type="text" id="reg-address" placeholder="Full residential address" class="form-control" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-document">Profile Photo</label>
+            <input type="file" id="reg-document" accept="image/png,image/jpeg" class="form-control" required />
+            <span class="form-help">Upload a professional headshot (Required)</span>
+          </div>
+        `;
+      }
       
       document.getElementById('reg-dynamic-fields').innerHTML = fields;
     };
@@ -1337,41 +1367,80 @@ function renderLogin() {
           
           <!-- LOGIN FORM -->
           <div id="login-form-container">
-            <form onsubmit="window.handleAuthForm(event, 'login')" style="display:flex; flex-direction:column; gap:16px; text-align:left;">
-              <input type="email" id="login-email" placeholder="Email Address" class="form-control" required />
-              <input type="password" id="login-password" placeholder="Password" class="form-control" required />
-              <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">Login</button>
+            <form onsubmit="window.handleAuthForm(event, 'login')">
+              <div class="form-group">
+                <label class="form-label" for="login-email">Email Address</label>
+                <input type="email" id="login-email" placeholder="name@example.com" class="form-control" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="login-password">Password</label>
+                <input type="password" id="login-password" placeholder="Enter your password" class="form-control" required />
+              </div>
+              <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; margin-top: 8px;">Login</button>
             </form>
+            <p style="margin-top: 16px; font-size: 13px; color: var(--text-secondary);">Are you an administrator? Please login with your admin credentials above.</p>
           </div>
 
           <!-- REGISTER FORM -->
           <div id="register-form-container" style="display:none;">
-            <form onsubmit="window.handleAuthForm(event, 'register')" style="display:flex; flex-direction:column; gap:16px; text-align:left;">
-              <select id="reg-role" class="form-control" onchange="window.updateRegFields()" required>
-                <option value="patient">Patient</option>
-                <option value="doctor">Clinic Doctor</option>
-                <option value="physio">Physiotherapist</option>
-                <option value="nurse">Nurse</option>
-              </select>
-              <input type="text" id="reg-name" placeholder="Full Name" class="form-control" required />
-              <input type="email" id="reg-email" placeholder="Email Address" class="form-control" required />
-              <input type="password" id="reg-password" placeholder="Password" class="form-control" required />
-              <div id="reg-dynamic-fields" style="display:flex; flex-direction:column; gap:16px;">
-                <input type="tel" id="reg-phone" placeholder="Phone Number" class="form-control" required />
-                <div style="text-align:left; margin-top: 8px;">
-                  <label style="display:block; margin-bottom:4px; font-weight:500; font-size:14px; color:var(--text-secondary);">Upload Medical History (Optional)</label>
+            <form onsubmit="window.handleAuthForm(event, 'register')">
+              <div class="form-group">
+                <label class="form-label" for="reg-role">I am a...</label>
+                <select id="reg-role" class="form-control" onchange="window.updateRegFields()" required>
+                  <option value="patient">Patient</option>
+                  <option value="doctor">Clinic Doctor</option>
+                  <option value="physio">Physiotherapist</option>
+                  <option value="nurse">Nurse</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="reg-name">Full Name</label>
+                <input type="text" id="reg-name" placeholder="Enter your full name" class="form-control" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="reg-email">Email Address</label>
+                <input type="email" id="reg-email" placeholder="name@example.com" class="form-control" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="reg-password">Password</label>
+                <input type="password" id="reg-password" placeholder="Create a strong password" class="form-control" required />
+              </div>
+              <div id="reg-dynamic-fields">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label" for="reg-dob">Date of Birth</label>
+                    <input type="date" id="reg-dob" class="form-control" required />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="reg-gender">Gender</label>
+                    <select id="reg-gender" class="form-control" required>
+                      <option value="">Select Gender</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="reg-phone">Mobile Number</label>
+                  <input type="tel" id="reg-phone" placeholder="Enter mobile number for OTP" class="form-control" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="reg-address">Residential Address</label>
+                  <input type="text" id="reg-address" placeholder="Full residential address" class="form-control" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="reg-document">Medical History</label>
                   <input type="file" id="reg-document" accept=".pdf,image/png,image/jpeg" class="form-control" />
+                  <span class="form-help">Upload PDF or Image (Optional)</span>
                 </div>
               </div>
-              <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">Register</button>
+              <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; margin-top: 8px;">Register</button>
             </form>
           </div>
           
         </div>
       </div>
-      <style>
-        .form-control { width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border); }
-      </style>
     `;
     if (window.lucide) lucide.createIcons();
   });
@@ -1380,16 +1449,73 @@ function renderLogin() {
 // ===== DASHBOARDS =====
 function renderPatientDashboard() {
   const main = document.getElementById('main-content');
-  import('./utils/db.js').then(async ({ getAppointmentsForUser, getCurrentUser }) => {
+  import('./utils/db.js').then(async ({ getAppointmentsForUser, getCurrentUser, fetchCurrentUserProfile, updateProfile }) => {
     const currentUser = getCurrentUser();
     if (!currentUser || currentUser.role !== 'patient') { location.hash = '/login'; return; }
     
+    window.submitPatientHealthProfile = async (e) => {
+      e.preventDefault();
+      try {
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData.entries());
+        await updateProfile('patient', data);
+        alert('Health profile updated successfully!');
+        renderPatientDashboard();
+      } catch(err) {
+        alert(err.message);
+      }
+    };
+
     try {
       const appointments = await getAppointmentsForUser(currentUser.id, 'patient');
+      let userObj = currentUser;
+      let profileData = {};
+      try {
+        const res = await fetchCurrentUserProfile();
+        userObj = res.user || currentUser;
+        profileData = res.profile || {};
+      } catch(e) {}
       
       main.innerHTML = `
         <div class="container" style="padding-top: var(--space-2xl); padding-bottom: var(--space-4xl);">
-          <h1 style="margin-bottom: var(--space-xl);">My Appointments</h1>
+          <h1 style="margin-bottom: var(--space-xl);">Patient Dashboard: ${userObj.name}</h1>
+
+          <!-- SECTION C: HEALTH PROFILE FORM -->
+          <div class="card" style="margin-bottom: var(--space-xl); border-left: 4px solid var(--primary);">
+            <h2 style="margin-bottom:16px; font-size:18px; color:var(--primary); display:flex; align-items:center; gap:8px;">
+              Section C: Health Profile
+            </h2>
+            <form onsubmit="window.submitPatientHealthProfile(event)">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Blood Group</label>
+                  <select name="blood_group" class="form-control">
+                    <option value="">Select Blood Group</option>
+                    ${['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(bg => `<option value="${bg}" ${userObj.blood_group === bg ? 'selected' : ''}>${bg}</option>`).join('')}
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Known Allergies</label>
+                  <input type="text" name="allergies" value="${userObj.allergies || ''}" placeholder="e.g. Penicillin, Dust" class="form-control" />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Existing Medical Conditions</label>
+                  <input type="text" name="medical_conditions" value="${userObj.medical_conditions || ''}" placeholder="e.g. Diabetes, Hypertension" class="form-control" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Current Medications</label>
+                  <input type="text" name="current_medications" value="${userObj.current_medications || ''}" placeholder="e.g. Metformin 500mg" class="form-control" />
+                </div>
+              </div>
+              <div style="margin-top: 8px;">
+                <button type="submit" class="btn btn-primary">Save Health Profile</button>
+              </div>
+            </form>
+          </div>
+
+          <h2 style="margin-top: var(--space-2xl); margin-bottom: var(--space-xl);">My Appointments</h2>
           ${appointments.length === 0 ? '<p style="color:var(--text-secondary);">No appointments booked yet.</p>' : `
             <div style="display: flex; flex-direction: column; gap: var(--space-md);">
               ${appointments.map(a => `
@@ -1437,7 +1563,7 @@ function renderPatientDashboard() {
 
 function renderDoctorDashboard() {
   const main = document.getElementById('main-content');
-  import('./utils/db.js').then(async ({ getAppointmentsForUser, updateAppointmentStatus, getCurrentUser }) => {
+  import('./utils/db.js').then(async ({ getAppointmentsForUser, updateAppointmentStatus, getCurrentUser, fetchCurrentUserProfile, updateProfile }) => {
     const currentUser = getCurrentUser();
     if (!currentUser || (currentUser.role !== 'doctor' && currentUser.role !== 'physio')) { location.hash = '/login'; return; }
     
@@ -1446,16 +1572,115 @@ function renderDoctorDashboard() {
       renderDoctorDashboard();
     };
 
+    window.submitProfileCompletion = async (e) => {
+      e.preventDefault();
+      try {
+        const formData = new FormData(e.target);
+        await updateProfile(currentUser.role, formData);
+        alert('Profile updated and submitted for verification!');
+        renderDoctorDashboard();
+      } catch(err) {
+        alert(err.message);
+      }
+    };
+
     try {
       const appointments = await getAppointmentsForUser(currentUser.id, currentUser.role);
       const newApts = appointments.filter(a => a.status === 'new');
       const todayApts = appointments.filter(a => a.status === 'accepted');
       const historyApts = appointments.filter(a => a.status === 'completed' || a.status === 'cancelled');
       
+      let profileData = {};
+      try {
+        const res = await fetchCurrentUserProfile();
+        profileData = res.profile || {};
+      } catch(e) {}
+      
+      const isPending = profileData.verification_status === 'pending' || !profileData.verification_status;
+      const needsCompletion = !profileData.registration_number;
+
       main.innerHTML = `
         <div class="container" style="padding-top: var(--space-2xl); padding-bottom: var(--space-4xl);">
           <h1 style="margin-bottom: var(--space-xl);">Doctor Dashboard: ${currentUser.name}</h1>
           
+          ${needsCompletion ? `
+            <div class="card" style="border-left: 4px solid var(--danger); margin-bottom: var(--space-xl);">
+              <h2 style="color: var(--danger); margin-bottom:16px;">Action Required: Complete Your Profile (Section B & C)</h2>
+              <form onsubmit="window.submitProfileCompletion(event)">
+                <h3 style="font-size:16px; margin-top:8px; margin-bottom:12px; color:var(--primary);">Section B: Professional & Medical Credentials</h3>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Medical Registration Number</label>
+                    <input type="text" name="registration_number" placeholder="State Council No." class="form-control" required />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Registering Council/State</label>
+                    <input type="text" name="registering_council" placeholder="e.g. Telangana State Medical Council" class="form-control" required />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Postgraduate Qualification</label>
+                    <input type="text" name="pg_qualification" placeholder="e.g. MD, MS, Diploma" class="form-control" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Years of Experience</label>
+                    <input type="number" name="years_of_experience" placeholder="Enter years" class="form-control" required />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">MBBS / Medical Degree Certificate</label>
+                    <input type="file" name="qualification_certificate" accept=".pdf,image/png,image/jpeg" class="form-control" required />
+                    <span class="form-help">Required (PDF/Image)</span>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Postgraduate Certificate</label>
+                    <input type="file" name="pg_certificate" accept=".pdf,image/png,image/jpeg" class="form-control" />
+                    <span class="form-help">Optional (PDF/Image)</span>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Govt-issued ID Proof (Aadhaar / PAN)</label>
+                    <input type="file" name="govt_id_proof" accept=".pdf,image/png,image/jpeg" class="form-control" required />
+                    <span class="form-help">Required (PDF/Image)</span>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Photo Holding ID</label>
+                    <input type="file" name="photo_with_id" accept="image/png,image/jpeg" class="form-control" />
+                    <span class="form-help">Optional - Extra Trust Layer (Image)</span>
+                  </div>
+                </div>
+                
+                <h3 style="font-size:16px; margin-top:24px; margin-bottom:12px; color:var(--primary);">Section C: Practice & Service Details</h3>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Hospital / Clinic Name</label>
+                    <input type="text" name="hospital" placeholder="Enter Hospital / Clinic Name" class="form-control" required />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Specialization</label>
+                    <input type="text" name="specialty" placeholder="e.g. General Physician, Pediatrician" class="form-control" required />
+                  </div>
+                </div>
+                <div class="form-group" style="margin-top: 8px; margin-bottom: 24px;">
+                  <label class="form-check">
+                    <input type="checkbox" name="is_clinic_doctor" value="true" class="form-check-input" />
+                    <span style="font-size: var(--fs-sm); color: var(--text-primary);">Available for Clinic Doctor Home Visits?</span>
+                  </label>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="margin-top:8px;">Submit Credentials for Verification</button>
+              </form>
+            </div>
+          ` : isPending ? `
+            <div class="card" style="border-left: 4px solid var(--warning); margin-bottom: var(--space-xl);">
+              <h3 style="color: var(--warning);">Profile Under Verification</h3>
+              <p>Your credentials have been submitted. Our admins are reviewing your documents. Once approved, you will appear in patient searches and listings.</p>
+            </div>
+          ` : ''}
+
           <div class="grid grid-3" style="margin-bottom: var(--space-xl);">
             <div class="stat-card" style="background:var(--bg-card); border:1px solid var(--border);">
               <div class="stat-number" style="color:var(--info);">${newApts.length}</div>
@@ -1524,7 +1749,7 @@ function renderDoctorDashboard() {
 
 function renderNurseDashboard() {
   const main = document.getElementById('main-content');
-  import('./utils/db.js').then(async ({ getAppointmentsForUser, updateAppointmentStatus, getCurrentUser }) => {
+  import('./utils/db.js').then(async ({ getAppointmentsForUser, updateAppointmentStatus, getCurrentUser, fetchCurrentUserProfile, updateProfile }) => {
     const currentUser = getCurrentUser();
     if (!currentUser || currentUser.role !== 'nurse') { location.hash = '/login'; return; }
     
@@ -1533,16 +1758,148 @@ function renderNurseDashboard() {
       renderNurseDashboard();
     };
 
+    window.submitProfileCompletion = async (e) => {
+      e.preventDefault();
+      try {
+        const formData = new FormData(e.target);
+        await updateProfile('nurse', formData);
+        alert('Profile updated and submitted for verification!');
+        renderNurseDashboard();
+      } catch(err) {
+        alert(err.message);
+      }
+    };
+
     try {
       const appointments = await getAppointmentsForUser(currentUser.id, 'nurse');
       const newApts = appointments.filter(a => a.status === 'new');
       const activeApts = appointments.filter(a => a.status === 'accepted');
       const historyApts = appointments.filter(a => a.status === 'completed' || a.status === 'cancelled');
       
+      let profileData = {};
+      try {
+        const res = await fetchCurrentUserProfile();
+        profileData = res.profile || {};
+      } catch(e) {}
+      
+      const isPending = profileData.verification_status === 'pending' || !profileData.verification_status;
+      const needsCompletion = !profileData.registration_number;
+
       main.innerHTML = `
         <div class="container" style="padding-top: var(--space-2xl); padding-bottom: var(--space-4xl);">
           <h1 style="margin-bottom: var(--space-xl);">Nurse Dashboard: ${currentUser.name}</h1>
           
+          ${needsCompletion ? `
+            <div class="card" style="border-left: 4px solid var(--danger); margin-bottom: var(--space-xl);">
+              <h2 style="color: var(--danger); margin-bottom:16px;">Action Required: Complete Your Profile (Section B & C)</h2>
+              <form onsubmit="window.submitProfileCompletion(event)">
+                <h3 style="font-size:16px; margin-top:8px; margin-bottom:12px; color:var(--primary);">Section B: Professional & Nursing Credentials</h3>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Nursing Registration Number</label>
+                    <input type="text" name="registration_number" placeholder="State Council No." class="form-control" required />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Registering Council/State</label>
+                    <input type="text" name="registering_council" placeholder="Registering Council/State" class="form-control" required />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Qualifications</label>
+                    <input type="text" name="pg_qualification" placeholder="e.g. B.Sc Nursing, GNM, ANM" class="form-control" required />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Years of Experience</label>
+                    <input type="number" name="years_of_experience" placeholder="Years of Experience" class="form-control" required />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Previous Work Experience</label>
+                  <input type="text" name="previous_experience_text" placeholder="Hospitals/Clinics worked at" class="form-control" />
+                </div>
+                
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Nursing Degree / Diploma Certificate</label>
+                    <input type="file" name="qualification_certificate" accept=".pdf,image/png,image/jpeg" class="form-control" required />
+                    <span class="form-help">Required (PDF/Image)</span>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Additional Certifications</label>
+                    <input type="file" name="additional_certifications" accept=".pdf,image/png,image/jpeg" class="form-control" />
+                    <span class="form-help">e.g. Critical Care, Elderly Care (Optional)</span>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Govt-issued ID Proof</label>
+                    <input type="file" name="govt_id_proof" accept=".pdf,image/png,image/jpeg" class="form-control" required />
+                    <span class="form-help">Aadhaar / PAN (Required)</span>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Police Verification / Background Check</label>
+                    <input type="file" name="background_check_doc" accept=".pdf,image/png,image/jpeg" class="form-control" required />
+                    <span class="form-help">Required (PDF/Image)</span>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Photo Holding ID</label>
+                  <input type="file" name="photo_with_id" accept="image/png,image/jpeg" class="form-control" />
+                  <span class="form-help">Optional (Image)</span>
+                </div>
+                
+                <h3 style="font-size:16px; margin-top:24px; margin-bottom:12px; color:var(--primary);">Section C: Service & Fee Details</h3>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Specialization</label>
+                    <input type="text" name="specialty" placeholder="Elderly Care, ICU, Post-Op" class="form-control" required />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Availability Type</label>
+                    <input type="text" name="availability_type" placeholder="One-time, Daily, Weekly, Live-in" class="form-control" required />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Service Area</label>
+                    <input type="text" name="service_area" placeholder="Localities / Pincodes covered" class="form-control" required />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Languages Spoken</label>
+                    <input type="text" name="languages_spoken" placeholder="Telugu, Hindi, English, Urdu" class="form-control" required />
+                  </div>
+                </div>
+                
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Fee: One-time (₹)</label>
+                    <input type="number" name="fee_onetime" placeholder="0" class="form-control" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Fee: Daily Rate (₹)</label>
+                    <input type="number" name="fee_daily" placeholder="0" class="form-control" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Fee: Weekly Rate (₹)</label>
+                    <input type="number" name="fee_weekly" placeholder="0" class="form-control" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Fee: Live-in Rate (₹)</label>
+                    <input type="number" name="fee_livein" placeholder="0" class="form-control" />
+                  </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="margin-top:8px;">Submit Credentials & Service Details</button>
+              </form>
+            </div>
+          ` : isPending ? `
+            <div class="card" style="border-left: 4px solid var(--warning); margin-bottom: var(--space-xl);">
+              <h3 style="color: var(--warning);">Profile & Background Check Under Verification</h3>
+              <p>Your documents have been submitted. Our admins are reviewing your credentials and background check. Once approved, you will appear in patient searches and nursing care listings.</p>
+            </div>
+          ` : ''}
+
           <div class="grid grid-3" style="margin-bottom: var(--space-xl);">
             <div class="stat-card" style="background:var(--bg-card); border:1px solid var(--border);">
               <div class="stat-number" style="color:var(--info);">${newApts.length}</div>
@@ -1609,6 +1966,191 @@ function renderNurseDashboard() {
   });
 }
 
+// ===== ADMIN DASHBOARD =====
+function renderAdminDashboard() {
+  const main = document.getElementById('main-content');
+  const user = getCurrentUser();
+  if (!user || user.role !== 'admin') {
+    location.hash = '/login';
+    return;
+  }
+
+  main.innerHTML = `<div class="container" style="padding: 40px; text-align: center;">Loading...</div>`;
+
+  import('./utils/db.js').then(async ({ getAdminProviders, verifyProvider }) => {
+    try {
+      const { doctors, nurses } = await getAdminProviders();
+      
+      const pendingDoctors = doctors.filter(d => d.verification_status !== 'verified' && d.verification_status !== 'rejected');
+      const verifiedDoctors = doctors.filter(d => d.verification_status === 'verified');
+      const pendingNurses = nurses.filter(n => n.verification_status !== 'verified' && n.verification_status !== 'rejected');
+      const verifiedNurses = nurses.filter(n => n.verification_status === 'verified');
+
+      window.handleVerify = async (type, id, vStatus, bgStatus) => {
+        try {
+          await verifyProvider(type, id, { verification_status: vStatus, background_check_status: bgStatus });
+          alert('Verification status updated');
+          renderAdminDashboard(); // refresh
+        } catch (err) {
+          alert(err.message);
+        }
+      };
+
+      const docRow = (d) => `
+        <tr style="border-bottom: 1px solid var(--border); transition: background 0.2s;" onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='transparent'">
+          <td style="padding:16px;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              ${d.profile_photo_url ? `<img src="${d.profile_photo_url}" style="width:40px; height:40px; border-radius:50%; object-fit:cover; border:1px solid var(--border);" />` : `<div style="width:40px; height:40px; border-radius:50%; background:var(--primary-light); color:var(--primary); display:flex; align-items:center; justify-content:center; font-weight:600;">${d.name.charAt(0).toUpperCase()}</div>`}
+              <div>
+                <strong style="font-size:15px; color:var(--text-primary);">${d.name}</strong>
+                <div style="font-size:13px; color:var(--text-secondary);">${d.email}</div>
+                ${d.specialty ? `<span class="badge badge-info" style="margin-top:4px; font-size:11px;">${d.specialty}</span>` : ''}
+              </div>
+            </div>
+          </td>
+          <td style="padding:16px;">
+            <div style="font-size:14px; font-weight:500;">${d.registration_number || 'Not Provided'}</div>
+            <div style="font-size:12px; color:var(--text-secondary);">${d.registering_council || 'Council not specified'}</div>
+            ${d.pg_qualification ? `<div style="font-size:12px; color:var(--primary); margin-top:2px;">🎓 ${d.pg_qualification}</div>` : ''}
+          </td>
+          <td style="padding:16px;">
+            <div style="display:flex; flex-direction:column; gap:4px; font-size:13px;">
+              ${d.qualification_certificate ? `<a href="${d.qualification_certificate}" target="_blank" style="color:var(--primary); text-decoration:none; display:inline-flex; align-items:center; gap:4px;"><i data-lucide="file-text" style="width:14px;height:14px;"></i> MBBS/Degree Cert</a>` : '<span style="color:var(--text-muted); font-size:12px;">No Degree File</span>'}
+              ${d.govt_id_proof ? `<a href="${d.govt_id_proof}" target="_blank" style="color:var(--primary); text-decoration:none; display:inline-flex; align-items:center; gap:4px;"><i data-lucide="id-card" style="width:14px;height:14px;"></i> Govt ID Proof</a>` : '<span style="color:var(--text-muted); font-size:12px;">No ID Proof</span>'}
+            </div>
+          </td>
+          <td style="padding:16px;">
+            <div style="display:flex; gap:8px; align-items:center;">
+              <button class="btn btn-primary btn-sm" onclick="window.handleVerify('doctor', '${d.id}', 'verified')" style="display:inline-flex; align-items:center; gap:4px;"><i data-lucide="check-circle" style="width:14px;height:14px;"></i> Approve</button>
+              <button class="btn btn-secondary btn-sm" onclick="window.handleVerify('doctor', '${d.id}', 'rejected')" style="color:var(--danger); border-color:var(--danger); display:inline-flex; align-items:center; gap:4px;"><i data-lucide="x-circle" style="width:14px;height:14px;"></i> Reject</button>
+            </div>
+          </td>
+        </tr>
+      `;
+
+      const nurseRow = (n) => `
+        <tr style="border-bottom: 1px solid var(--border); transition: background 0.2s;" onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='transparent'">
+          <td style="padding:16px;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              ${n.profile_photo_url ? `<img src="${n.profile_photo_url}" style="width:40px; height:40px; border-radius:50%; object-fit:cover; border:1px solid var(--border);" />` : `<div style="width:40px; height:40px; border-radius:50%; background:var(--secondary-light); color:var(--secondary); display:flex; align-items:center; justify-content:center; font-weight:600;">${n.name.charAt(0).toUpperCase()}</div>`}
+              <div>
+                <strong style="font-size:15px; color:var(--text-primary);">${n.name}</strong>
+                <div style="font-size:13px; color:var(--text-secondary);">${n.email}</div>
+                ${n.specialty ? `<span class="badge badge-success" style="margin-top:4px; font-size:11px;">${n.specialty}</span>` : ''}
+              </div>
+            </div>
+          </td>
+          <td style="padding:16px;">
+            <div style="font-size:14px; font-weight:500;">${n.registration_number || 'Not Provided'}</div>
+            <div style="font-size:12px; color:var(--text-secondary);">${n.registering_council || 'Council not specified'}</div>
+            ${n.pg_qualification ? `<div style="font-size:12px; color:var(--primary); margin-top:2px;">🎓 ${n.pg_qualification}</div>` : ''}
+          </td>
+          <td style="padding:16px;">
+            <div style="display:flex; flex-direction:column; gap:4px; font-size:13px;">
+              ${n.qualification_certificate ? `<a href="${n.qualification_certificate}" target="_blank" style="color:var(--primary); text-decoration:none; display:inline-flex; align-items:center; gap:4px;"><i data-lucide="file-text" style="width:14px;height:14px;"></i> Nursing Cert</a>` : '<span style="color:var(--text-muted); font-size:12px;">No Cert</span>'}
+              ${n.govt_id_proof ? `<a href="${n.govt_id_proof}" target="_blank" style="color:var(--primary); text-decoration:none; display:inline-flex; align-items:center; gap:4px;"><i data-lucide="id-card" style="width:14px;height:14px;"></i> Govt ID Proof</a>` : '<span style="color:var(--text-muted); font-size:12px;">No ID Proof</span>'}
+              ${n.background_check_doc ? `<a href="${n.background_check_doc}" target="_blank" style="color:var(--primary); text-decoration:none; display:inline-flex; align-items:center; gap:4px;"><i data-lucide="shield-check" style="width:14px;height:14px;"></i> Police Verification</a>` : '<span style="color:var(--text-muted); font-size:12px;">No Police Doc</span>'}
+            </div>
+          </td>
+          <td style="padding:16px;">
+            <div style="display:flex; gap:8px; align-items:center;">
+              <button class="btn btn-primary btn-sm" onclick="window.handleVerify('nurse', '${n.id}', 'verified', 'cleared')" style="display:inline-flex; align-items:center; gap:4px;"><i data-lucide="check-circle" style="width:14px;height:14px;"></i> Approve</button>
+              <button class="btn btn-secondary btn-sm" onclick="window.handleVerify('nurse', '${n.id}', 'rejected', 'failed')" style="color:var(--danger); border-color:var(--danger); display:inline-flex; align-items:center; gap:4px;"><i data-lucide="x-circle" style="width:14px;height:14px;"></i> Reject</button>
+            </div>
+          </td>
+        </tr>
+      `;
+
+      main.innerHTML = `
+        <div class="container" style="padding-top: var(--space-4xl); padding-bottom: var(--space-4xl);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--space-2xl); background:var(--bg-card); padding:var(--space-xl); border-radius:var(--radius-lg); border:1px solid var(--border);">
+            <div>
+              <h1 style="font-size:24px; font-weight:700; margin-bottom:4px;">Admin Portal</h1>
+              <p style="color:var(--text-secondary); margin:0;">Medical Provider Credentials & Verification Management</p>
+            </div>
+            <div style="text-align:right;">
+              <span class="badge badge-primary" style="font-size:12px; padding:6px 12px;">Logged in as System Admin</span>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom: var(--space-2xl); border-top:4px solid var(--warning);">
+            <h2 style="margin-bottom:16px; display:flex; align-items:center; justify-content:space-between;">
+              <span>🩺 Pending Doctor Verifications</span>
+              <span class="badge badge-warning">${pendingDoctors.length} Pending</span>
+            </h2>
+            ${pendingDoctors.length === 0 ? '<p style="color:var(--text-secondary); padding:12px 0;">All doctor applications have been processed.</p>' : `
+              <div style="overflow-x:auto;">
+                <table style="width:100%; text-align:left; border-collapse:collapse;">
+                  <thead>
+                    <tr style="border-bottom:2px solid var(--border); color:var(--text-secondary); font-size:13px; text-transform:uppercase; letter-spacing:0.5px;">
+                      <th style="padding:12px 16px;">Doctor Info</th>
+                      <th style="padding:12px 16px;">Registration & Qualification</th>
+                      <th style="padding:12px 16px;">Submitted Documents</th>
+                      <th style="padding:12px 16px;">Verification Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>${pendingDoctors.map(docRow).join('')}</tbody>
+                </table>
+              </div>
+            `}
+          </div>
+
+          <div class="card" style="margin-bottom: var(--space-2xl); border-top:4px solid var(--info);">
+            <h2 style="margin-bottom:16px; display:flex; align-items:center; justify-content:space-between;">
+              <span>🩺 Pending Nurse Verifications</span>
+              <span class="badge badge-info">${pendingNurses.length} Pending</span>
+            </h2>
+            ${pendingNurses.length === 0 ? '<p style="color:var(--text-secondary); padding:12px 0;">All nurse applications have been processed.</p>' : `
+              <div style="overflow-x:auto;">
+                <table style="width:100%; text-align:left; border-collapse:collapse;">
+                  <thead>
+                    <tr style="border-bottom:2px solid var(--border); color:var(--text-secondary); font-size:13px; text-transform:uppercase; letter-spacing:0.5px;">
+                      <th style="padding:12px 16px;">Nurse Info</th>
+                      <th style="padding:12px 16px;">Registration & Qualification</th>
+                      <th style="padding:12px 16px;">Submitted Documents</th>
+                      <th style="padding:12px 16px;">Verification Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>${pendingNurses.map(nurseRow).join('')}</tbody>
+                </table>
+              </div>
+            `}
+          </div>
+          
+          <div class="grid grid-2">
+            <div class="card" style="border-top:4px solid var(--success);">
+              <h3 style="margin-bottom:12px; display:flex; align-items:center; justify-content:space-between;">
+                <span>Verified Doctors</span>
+                <span class="badge badge-success">${verifiedDoctors.length} Active</span>
+              </h3>
+              ${verifiedDoctors.length === 0 ? '<p style="color:var(--text-secondary); font-size:14px;">No verified doctors currently.</p>' : `
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                  ${verifiedDoctors.map(d => `<div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border); font-size:14px;"><span><strong>${d.name}</strong> (${d.specialty || 'General'})</span><span style="color:var(--success); font-size:12px;">✓ Verified</span></div>`).join('')}
+                </div>
+              `}
+            </div>
+            
+            <div class="card" style="border-top:4px solid var(--success);">
+              <h3 style="margin-bottom:12px; display:flex; align-items:center; justify-content:space-between;">
+                <span>Verified Nurses</span>
+                <span class="badge badge-success">${verifiedNurses.length} Active</span>
+              </h3>
+              ${verifiedNurses.length === 0 ? '<p style="color:var(--text-secondary); font-size:14px;">No verified nurses currently.</p>' : `
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                  ${verifiedNurses.map(n => `<div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border); font-size:14px;"><span><strong>${n.name}</strong> (${n.specialty || 'Nursing Care'})</span><span style="color:var(--success); font-size:12px;">✓ Verified</span></div>`).join('')}
+                </div>
+              `}
+            </div>
+          </div>
+        </div>
+      `;
+      if (window.lucide) lucide.createIcons();
+    } catch (err) {
+      main.innerHTML = `<div class="container" style="padding:40px;"><p style="color:var(--danger);">${err.message}</p></div>`;
+    }
+  });
+}
+
 // ===== REGISTER ROUTES =====
 router.addRoute('/book', renderBookingPage);
 router.addRoute('/hospital', renderHospitalProfile);
@@ -1625,6 +2167,7 @@ router.addRoute('/login', renderLogin);
 router.addRoute('/patient-dashboard', renderPatientDashboard);
 router.addRoute('/doctor-dashboard', renderDoctorDashboard);
 router.addRoute('/nurse-dashboard', renderNurseDashboard);
+router.addRoute('/admin-dashboard', renderAdminDashboard);
 
 // ===== INITIALIZE =====
 function initializeApp() {

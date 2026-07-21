@@ -34,19 +34,23 @@ async function fetchWithAuth(url, options = {}) {
 }
 
 // Auth methods
-export async function register(userData) {
+export async function register(userData, role) {
   try {
     let options = { method: 'POST' };
 
     if (userData instanceof FormData) {
       options.body = userData;
-      // Fetch automatically sets the correct multipart/form-data boundary when passing FormData
     } else {
       options.headers = { 'Content-Type': 'application/json' };
       options.body = JSON.stringify(userData);
     }
 
-    const data = await fetchWithAuth('/auth/register', options);
+    let endpoint = '/auth/register'; // fallback
+    if (role === 'doctor' || role === 'physio') endpoint = '/auth/doctor-register';
+    else if (role === 'nurse') endpoint = '/auth/nurse-register';
+    else if (role === 'patient') endpoint = '/auth/patient-register';
+
+    const data = await fetchWithAuth(endpoint, options);
     if (data.token) {
       localStorage.setItem(DB_KEY_TOKEN, data.token);
       localStorage.setItem(DB_KEY_SESSION, JSON.stringify(data.user));
@@ -89,6 +93,17 @@ export function getCurrentUser() {
 
 export async function fetchCurrentUserProfile() {
   return await fetchWithAuth('/auth/me');
+}
+
+export async function updateProfile(type, data) {
+  let options = { method: 'PATCH' };
+  if (data instanceof FormData) {
+    options.body = data;
+  } else {
+    options.headers = { 'Content-Type': 'application/json' };
+    options.body = JSON.stringify(data);
+  }
+  return await fetchWithAuth(`/profile/${type}`, options);
 }
 
 export function getUsers() {
@@ -163,4 +178,20 @@ export async function loadPublicData() {
   } catch (err) {
     console.error("Failed to load public data", err);
   }
+}
+
+export async function getAdminProviders() {
+  const res = await fetch(`${API_BASE}/admin/providers`);
+  if (!res.ok) throw new Error('Failed to fetch providers');
+  return await res.json();
+}
+
+export async function verifyProvider(type, id, data) {
+  const res = await fetch(`${API_BASE}/admin/verify/${type}/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  if (!res.ok) throw new Error('Failed to verify provider');
+  return await res.json();
 }

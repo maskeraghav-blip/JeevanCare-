@@ -27,15 +27,22 @@ router.get('/clinics', async (req, res) => {
 });
 
 // @route   GET /api/public/doctors
-// @desc    Get all doctors (Clinic Doctors + Physios)
+// @desc    Get all doctors (Clinic Doctors + Physios) that are verified
 router.get('/doctors', async (req, res) => {
   try {
-    // Join users with doctor_profiles to get all details
     const [doctors] = await db.query(`
-      SELECT u.id, u.name, u.email, u.role, d.specialty, d.hospital, d.is_clinic_doctor AS isClinicDoctor, 'Hyderabad' as city, '5+ Years' as experience, true as verified, 'REG12345' as registration, 4.8 as rating
+      SELECT 
+        u.id, u.name, u.role, 
+        d.profile_photo_url, d.specialty, d.hospital, 
+        d.is_clinic_doctor AS isClinicDoctor, 
+        COALESCE(d.years_of_experience, '5+') as experience, 
+        d.verification_status, 
+        d.registration_number, 
+        4.8 as rating
       FROM users u
       INNER JOIN doctor_profiles d ON u.id = d.user_id
-      WHERE u.role IN ('doctor', 'physio')
+      WHERE u.role IN ('doctor', 'physio') 
+      AND d.verification_status = 'verified'
     `);
     res.json(doctors);
   } catch (error) {
@@ -45,15 +52,22 @@ router.get('/doctors', async (req, res) => {
 });
 
 // @route   GET /api/public/nurses
-// @desc    Get all nurses
+// @desc    Get all nurses that are verified and background checked
 router.get('/nurses', async (req, res) => {
   try {
-    // Join users with nurse_profiles
     const [nurses] = await db.query(`
-      SELECT u.id, u.name, u.email, u.role, n.specialty, n.experience
+      SELECT 
+        u.id, u.name, u.role, 
+        n.profile_photo_url, n.specialty, 
+        COALESCE(n.experience, n.previous_experience_text) as experience,
+        n.verification_status, n.background_check_status,
+        n.service_area, n.fee_onetime, n.fee_daily, n.fee_weekly, n.fee_livein,
+        n.languages_spoken, n.availability_type, 4.9 as rating
       FROM users u
       INNER JOIN nurse_profiles n ON u.id = n.user_id
-      WHERE u.role = 'nurse'
+      WHERE u.role = 'nurse' 
+      AND n.verification_status = 'verified' 
+      AND n.background_check_status = 'cleared'
     `);
     res.json(nurses);
   } catch (error) {
