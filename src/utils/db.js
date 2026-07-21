@@ -1,40 +1,65 @@
 /* ============================================
-   JeevanCare+ Mock Database (LocalStorage)
+   JeevanCare+ Database Client (Fetch API)
    ============================================ */
 
-const DB_KEY_USERS = 'jeevancare_users';
-const DB_KEY_APPOINTMENTS = 'jeevancare_appointments';
+const API_BASE = 'http://localhost:5000/api';
 const DB_KEY_SESSION = 'jeevancare_session';
+const DB_KEY_TOKEN = 'jeevancare_token';
 
-// Initialize mock data if empty
+// Initialize mock data if empty (Not needed for real DB, but kept for compatibility)
 export function initDB() {
-  if (!localStorage.getItem(DB_KEY_USERS)) {
-    const mockUsers = [
-      { id: 'p1', name: 'John Doe', role: 'patient', phone: '9876543210' },
-      { id: 'd1', name: 'Dr. Ramesh Kumar', role: 'doctor', specialty: 'General Physician', phone: '9998887776' },
-      { id: 'd2', name: 'Dr. Anita Sharma', role: 'physio', specialty: 'Physiotherapist', phone: '9998887777' },
-      { id: 'n1', name: 'Nurse Priya', role: 'nurse', type: 'Registered Nurse', phone: '9998887778' }
-    ];
-    localStorage.setItem(DB_KEY_USERS, JSON.stringify(mockUsers));
+  // DB is managed by MySQL now.
+}
+
+// Helper for fetch with auth
+async function fetchWithAuth(url, options = {}) {
+  const token = localStorage.getItem(DB_KEY_TOKEN);
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+    ...options.headers
+  };
+  
+  const response = await fetch(`${API_BASE}${url}`, { ...options, headers });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || 'API Request Failed');
   }
-  if (!localStorage.getItem(DB_KEY_APPOINTMENTS)) {
-    localStorage.setItem(DB_KEY_APPOINTMENTS, JSON.stringify([]));
-  }
+  return response.json();
 }
 
 // Auth methods
+export async function register(userData) {
+  const data = await fetchWithAuth('/auth/register', {
+    method: 'POST',
+    body: JSON.stringify(userData)
+  });
+  localStorage.setItem(DB_KEY_TOKEN, data.token);
+  localStorage.setItem(DB_KEY_SESSION, JSON.stringify(data.user));
+  return data.user;
+}
+
+export async function loginApi(email, password) {
+  const data = await fetchWithAuth('/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ email, password })
+  });
+  localStorage.setItem(DB_KEY_TOKEN, data.token);
+  localStorage.setItem(DB_KEY_SESSION, JSON.stringify(data.user));
+  return data.user;
+}
+
+// Used by old mock UI to quickly login as a user ID
 export function login(userId) {
-  const users = JSON.parse(localStorage.getItem(DB_KEY_USERS) || '[]');
-  const user = users.find(u => u.id === userId);
-  if (user) {
-    localStorage.setItem(DB_KEY_SESSION, JSON.stringify(user));
-    return user;
-  }
+  // The old code passed a raw ID. This won't work easily with real auth without credentials.
+  // We'll throw an error if used, because we're moving to real auth.
+  console.error("Mock login(userId) is deprecated. Use loginApi(email, password) instead.");
   return null;
 }
 
 export function logout() {
   localStorage.removeItem(DB_KEY_SESSION);
+  localStorage.removeItem(DB_KEY_TOKEN);
 }
 
 export function getCurrentUser() {
@@ -42,52 +67,30 @@ export function getCurrentUser() {
   return session ? JSON.parse(session) : null;
 }
 
+export async function fetchCurrentUserProfile() {
+  return await fetchWithAuth('/auth/me');
+}
+
 export function getUsers() {
-  return JSON.parse(localStorage.getItem(DB_KEY_USERS) || '[]');
+  // Deprecated. We don't fetch all users anymore.
+  return [];
 }
 
 // Appointment methods
-export function createAppointment(data) {
-  const appointments = JSON.parse(localStorage.getItem(DB_KEY_APPOINTMENTS) || '[]');
-  const newAppointment = {
-    id: 'apt_' + Date.now(),
-    patientId: data.patientId,
-    patientName: data.patientName,
-    patientPhone: data.patientPhone,
-    providerId: data.providerId,
-    providerName: data.providerName,
-    providerRole: data.providerRole,
-    type: data.type, // 'home-visit', 'clinic-visit', 'nursing'
-    date: data.date,
-    time: data.time,
-    address: data.address,
-    notes: data.notes,
-    status: 'new',
-    createdAt: new Date().toISOString()
-  };
-  appointments.push(newAppointment);
-  localStorage.setItem(DB_KEY_APPOINTMENTS, JSON.stringify(appointments));
-  return newAppointment;
+export async function createAppointment(data) {
+  return await fetchWithAuth('/appointments', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  });
 }
 
-export function updateAppointmentStatus(appointmentId, status) {
-  const appointments = JSON.parse(localStorage.getItem(DB_KEY_APPOINTMENTS) || '[]');
-  const index = appointments.findIndex(a => a.id === appointmentId);
-  if (index > -1) {
-    appointments[index].status = status;
-    appointments[index].updatedAt = new Date().toISOString();
-    localStorage.setItem(DB_KEY_APPOINTMENTS, JSON.stringify(appointments));
-    return appointments[index];
-  }
-  return null;
+export async function updateAppointmentStatus(appointmentId, status) {
+  return await fetchWithAuth(`/appointments/${appointmentId}/status`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status })
+  });
 }
 
-export function getAppointmentsForUser(userId, role) {
-  const appointments = JSON.parse(localStorage.getItem(DB_KEY_APPOINTMENTS) || '[]');
-  if (role === 'patient') {
-    return appointments.filter(a => a.patientId === userId).reverse();
-  } else {
-    // For doctor or nurse
-    return appointments.filter(a => a.providerId === userId).reverse();
-  }
+export async function getAppointmentsForUser(userId, role) {
+  return await fetchWithAuth('/appointments');
 }

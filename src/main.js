@@ -193,7 +193,7 @@ window.openBookingModal = (providerId, providerName, providerRole, type) => {
   
   document.getElementById('booking-form').addEventListener('submit', (e) => {
     e.preventDefault();
-    import('./utils/db.js').then(({ createAppointment }) => {
+    import('./utils/db.js').then(async ({ createAppointment }) => {
       let notesText = document.getElementById('b-notes').value;
       if (isHospital) {
          const dept = document.getElementById('b-dept').value;
@@ -202,27 +202,31 @@ window.openBookingModal = (providerId, providerName, providerRole, type) => {
          notesText = `Dept: ${dept} | Doc: ${docText} | ${notesText}`;
       }
 
-      createAppointment({
-        patientId: user.id,
-        patientName: document.getElementById('b-name').value,
-        patientPhone: document.getElementById('b-phone').value,
-        providerId: providerId,
-        providerName: providerName,
-        providerRole: providerRole,
-        type: type,
-        date: document.getElementById('b-date').value,
-        time: document.getElementById('b-time').value,
-        address: isHospital ? 'In-person Hospital Visit' : document.getElementById('b-address').value,
-        notes: notesText,
-        status: isHospital ? 'pending' : 'new'
-      });
-      modal.classList.add('hidden');
-      if (isHospital) {
-        alert('Your request has been sent. Please call the hospital to confirm your slot.');
-      } else {
-        alert('Booking confirmed! It is now pending provider acceptance.');
+      try {
+        await createAppointment({
+          patientId: user.id,
+          patientName: document.getElementById('b-name').value,
+          patientPhone: document.getElementById('b-phone').value,
+          providerId: providerId,
+          providerName: providerName,
+          providerRole: providerRole,
+          type: type,
+          date: document.getElementById('b-date').value,
+          time: document.getElementById('b-time').value,
+          address: isHospital ? 'In-person Hospital Visit' : document.getElementById('b-address').value,
+          notes: notesText,
+          status: isHospital ? 'pending' : 'new'
+        });
+        modal.classList.add('hidden');
+        if (isHospital) {
+          alert('Your request has been sent. Please call the hospital to confirm your slot.');
+        } else {
+          alert('Booking confirmed! It is now pending provider acceptance.');
+        }
+        location.hash = '/patient-dashboard';
+      } catch (err) {
+        alert("Failed to create appointment: " + err.message);
       }
-      location.hash = '/patient-dashboard';
     });
   });
 };
@@ -1201,38 +1205,107 @@ function renderServices() {
 // ===== PAGE: LOGIN =====
 function renderLogin() {
   const main = document.getElementById('main-content');
-  import('./utils/db.js').then(({ getUsers, login }) => {
-    const users = getUsers();
+  import('./utils/db.js').then(({ loginApi, register }) => {
     
-    // Quick login handler
-    window.handleLogin = (userId) => {
-      const user = login(userId);
-      if (user) {
-        renderNavbar();
-        if (user.role === 'patient') location.hash = '/patient-dashboard';
-        else if (user.role === 'doctor' || user.role === 'physio') location.hash = '/doctor-dashboard';
-        else if (user.role === 'nurse') location.hash = '/nurse-dashboard';
+    window.handleAuthForm = async (e, type) => {
+      e.preventDefault();
+      try {
+        if (type === 'login') {
+          const email = document.getElementById('login-email').value;
+          const password = document.getElementById('login-password').value;
+          const user = await loginApi(email, password);
+          if (user) {
+            import('./main.js').then(m => window.location.reload());
+          }
+        } else {
+          const role = document.getElementById('reg-role').value;
+          const userData = {
+            email: document.getElementById('reg-email').value,
+            password: document.getElementById('reg-password').value,
+            name: document.getElementById('reg-name').value,
+            role: role,
+            phone: document.getElementById('reg-phone') ? document.getElementById('reg-phone').value : undefined,
+            specialty: document.getElementById('reg-specialty') ? document.getElementById('reg-specialty').value : undefined,
+            hospital: document.getElementById('reg-hospital') ? document.getElementById('reg-hospital').value : undefined,
+            experience: document.getElementById('reg-experience') ? document.getElementById('reg-experience').value : undefined
+          };
+          const user = await register(userData);
+          if (user) {
+             window.location.reload();
+          }
+        }
+      } catch (err) {
+        alert(err.message);
       }
+    };
+
+    window.toggleAuthTab = (tab) => {
+      document.getElementById('login-form-container').style.display = tab === 'login' ? 'block' : 'none';
+      document.getElementById('register-form-container').style.display = tab === 'register' ? 'block' : 'none';
+    };
+
+    window.updateRegFields = () => {
+      const role = document.getElementById('reg-role').value;
+      let fields = '';
+      if (role === 'patient') {
+        fields = `<input type="tel" id="reg-phone" placeholder="Phone Number" class="form-control" required />`;
+      } else if (role === 'doctor' || role === 'physio') {
+        fields = `
+          <input type="text" id="reg-specialty" placeholder="Specialty" class="form-control" required />
+          <input type="text" id="reg-hospital" placeholder="Hospital/Clinic" class="form-control" required />
+        `;
+      } else if (role === 'nurse') {
+        fields = `
+          <input type="text" id="reg-specialty" placeholder="Specialty (e.g. Registered Nurse)" class="form-control" required />
+          <input type="text" id="reg-experience" placeholder="Experience (e.g. 5 Years)" class="form-control" required />
+        `;
+      }
+      document.getElementById('reg-dynamic-fields').innerHTML = fields;
     };
 
     main.innerHTML = `
       <div class="container" style="max-width: 500px; padding-top: var(--space-4xl); padding-bottom: var(--space-4xl);">
         <div class="card" style="text-align: center;">
-          <h2 style="margin-bottom: var(--space-md);">Login to JeevanCare+</h2>
-          <p style="color: var(--text-secondary); margin-bottom: var(--space-xl);">Select an account to login as for testing purposes.</p>
+          <h2 style="margin-bottom: var(--space-md);">Welcome to JeevanCare+</h2>
           
-          <div style="display: flex; flex-direction: column; gap: var(--space-md);">
-            ${users.map(u => `
-              <button class="btn btn-secondary" onclick="window.handleLogin('${u.id}')" style="justify-content: flex-start; padding: 16px;">
-                <div style="text-align: left;">
-                  <div style="font-weight: 600;">${u.name}</div>
-                  <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-top: 4px;">Role: ${u.role}</div>
-                </div>
-              </button>
-            `).join('')}
+          <div style="display:flex; justify-content:center; gap:16px; margin-bottom:24px;">
+            <button class="btn btn-secondary" onclick="window.toggleAuthTab('login')">Login</button>
+            <button class="btn btn-secondary" onclick="window.toggleAuthTab('register')">Register</button>
           </div>
+          
+          <!-- LOGIN FORM -->
+          <div id="login-form-container">
+            <form onsubmit="window.handleAuthForm(event, 'login')" style="display:flex; flex-direction:column; gap:16px; text-align:left;">
+              <input type="email" id="login-email" placeholder="Email Address" class="form-control" required />
+              <input type="password" id="login-password" placeholder="Password" class="form-control" required />
+              <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">Login</button>
+            </form>
+          </div>
+
+          <!-- REGISTER FORM -->
+          <div id="register-form-container" style="display:none;">
+            <form onsubmit="window.handleAuthForm(event, 'register')" style="display:flex; flex-direction:column; gap:16px; text-align:left;">
+              <select id="reg-role" class="form-control" onchange="window.updateRegFields()" required>
+                <option value="patient">Patient</option>
+                <option value="doctor">Clinic Doctor</option>
+                <option value="physio">Physiotherapist</option>
+                <option value="nurse">Nurse</option>
+              </select>
+              <input type="text" id="reg-name" placeholder="Full Name" class="form-control" required />
+              <input type="email" id="reg-email" placeholder="Email Address" class="form-control" required />
+              <input type="password" id="reg-password" placeholder="Password" class="form-control" required />
+              <div id="reg-dynamic-fields" style="display:flex; flex-direction:column; gap:16px;">
+                <input type="tel" id="reg-phone" placeholder="Phone Number" class="form-control" required />
+              </div>
+              <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">Register</button>
+            </form>
+          </div>
+          
         </div>
       </div>
+      <style>
+        .form-control { width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border); }
+      </style>
     `;
     if (window.lucide) lucide.createIcons();
   });
@@ -1241,204 +1314,215 @@ function renderLogin() {
 // ===== DASHBOARDS =====
 function renderPatientDashboard() {
   const main = document.getElementById('main-content');
-  const user = window.getCurrentUser ? window.getCurrentUser() : null;
-  import('./utils/db.js').then(({ getAppointmentsForUser, getCurrentUser }) => {
+  import('./utils/db.js').then(async ({ getAppointmentsForUser, getCurrentUser }) => {
     const currentUser = getCurrentUser();
     if (!currentUser || currentUser.role !== 'patient') { location.hash = '/login'; return; }
     
-    const appointments = getAppointmentsForUser(currentUser.id, 'patient');
-    
-    main.innerHTML = `
-      <div class="container" style="padding-top: var(--space-2xl); padding-bottom: var(--space-4xl);">
-        <h1 style="margin-bottom: var(--space-xl);">My Appointments</h1>
-        ${appointments.length === 0 ? '<p style="color:var(--text-secondary);">No appointments booked yet.</p>' : `
-          <div style="display: flex; flex-direction: column; gap: var(--space-md);">
-            ${appointments.map(a => `
-              <div class="card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
-                <div>
-                  <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
-                    <span class="badge" style="background:var(--surface-active);">${a.type.toUpperCase()}</span>
-                    <span style="font-weight:600; color:${(a.status === 'new' || a.status === 'pending') ? 'var(--info)' : a.status === 'accepted' ? 'var(--warning)' : a.status === 'completed' ? 'var(--success)' : 'var(--danger)'}; text-transform:uppercase; font-size:12px;">${a.status}</span>
+    try {
+      const appointments = await getAppointmentsForUser(currentUser.id, 'patient');
+      
+      main.innerHTML = `
+        <div class="container" style="padding-top: var(--space-2xl); padding-bottom: var(--space-4xl);">
+          <h1 style="margin-bottom: var(--space-xl);">My Appointments</h1>
+          ${appointments.length === 0 ? '<p style="color:var(--text-secondary);">No appointments booked yet.</p>' : `
+            <div style="display: flex; flex-direction: column; gap: var(--space-md);">
+              ${appointments.map(a => `
+                <div class="card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+                  <div>
+                    <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
+                      <span class="badge" style="background:var(--surface-active);">${a.type.toUpperCase()}</span>
+                      <span style="font-weight:600; color:${(a.status === 'new' || a.status === 'pending') ? 'var(--info)' : a.status === 'accepted' ? 'var(--warning)' : a.status === 'completed' ? 'var(--success)' : 'var(--danger)'}; text-transform:uppercase; font-size:12px;">${a.status}</span>
+                    </div>
+                    <h3 style="margin-bottom:4px;">${a.providerName}</h3>
+                    <div style="color:var(--text-secondary); font-size:14px;">📅 ${a.date} at ${a.time}</div>
                   </div>
-                  <h3 style="margin-bottom:4px;">${a.providerName}</h3>
-                  <div style="color:var(--text-secondary); font-size:14px;">📅 ${a.date} at ${a.time}</div>
+                  <div>
+                    ${a.status === 'accepted' ? `<a href="tel:0000000000" class="btn btn-secondary btn-sm"><i data-lucide="phone" style="width:14px;height:14px;"></i> Contact Provider</a>` : ''}
+                  </div>
                 </div>
-                <div>
-                  ${a.status === 'accepted' ? `<a href="tel:0000000000" class="btn btn-secondary btn-sm"><i data-lucide="phone" style="width:14px;height:14px;"></i> Contact Provider</a>` : ''}
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        `}
-      </div>
-    `;
-    if (window.lucide) lucide.createIcons();
+              `).join('')}
+            </div>
+          `}
+        </div>
+      `;
+      if (window.lucide) lucide.createIcons();
+    } catch (err) {
+      main.innerHTML = `<div class="container" style="padding:40px;"><p style="color:var(--danger);">${err.message}</p></div>`;
+    }
   });
 }
 
 function renderDoctorDashboard() {
   const main = document.getElementById('main-content');
-  import('./utils/db.js').then(({ getAppointmentsForUser, updateAppointmentStatus, getCurrentUser }) => {
+  import('./utils/db.js').then(async ({ getAppointmentsForUser, updateAppointmentStatus, getCurrentUser }) => {
     const currentUser = getCurrentUser();
     if (!currentUser || (currentUser.role !== 'doctor' && currentUser.role !== 'physio')) { location.hash = '/login'; return; }
     
-    window.handleStatusUpdate = (aptId, status) => {
-      updateAppointmentStatus(aptId, status);
+    window.handleStatusUpdate = async (aptId, status) => {
+      await updateAppointmentStatus(aptId, status);
       renderDoctorDashboard();
     };
 
-    const appointments = getAppointmentsForUser(currentUser.id, currentUser.role);
-    const newApts = appointments.filter(a => a.status === 'new');
-    const todayApts = appointments.filter(a => a.status === 'accepted');
-    const historyApts = appointments.filter(a => a.status === 'completed' || a.status === 'cancelled');
-    
-    main.innerHTML = `
-      <div class="container" style="padding-top: var(--space-2xl); padding-bottom: var(--space-4xl);">
-        <h1 style="margin-bottom: var(--space-xl);">Doctor Dashboard: ${currentUser.name}</h1>
-        
-        <div class="grid grid-3" style="margin-bottom: var(--space-xl);">
-          <div class="stat-card" style="background:var(--bg-card); border:1px solid var(--border);">
-            <div class="stat-number" style="color:var(--info);">${newApts.length}</div>
-            <div class="stat-label">New Requests</div>
+    try {
+      const appointments = await getAppointmentsForUser(currentUser.id, currentUser.role);
+      const newApts = appointments.filter(a => a.status === 'new');
+      const todayApts = appointments.filter(a => a.status === 'accepted');
+      const historyApts = appointments.filter(a => a.status === 'completed' || a.status === 'cancelled');
+      
+      main.innerHTML = `
+        <div class="container" style="padding-top: var(--space-2xl); padding-bottom: var(--space-4xl);">
+          <h1 style="margin-bottom: var(--space-xl);">Doctor Dashboard: ${currentUser.name}</h1>
+          
+          <div class="grid grid-3" style="margin-bottom: var(--space-xl);">
+            <div class="stat-card" style="background:var(--bg-card); border:1px solid var(--border);">
+              <div class="stat-number" style="color:var(--info);">${newApts.length}</div>
+              <div class="stat-label">New Requests</div>
+            </div>
+            <div class="stat-card" style="background:var(--bg-card); border:1px solid var(--border);">
+              <div class="stat-number" style="color:var(--warning);">${todayApts.length}</div>
+              <div class="stat-label">Accepted / Upcoming</div>
+            </div>
+            <div class="stat-card" style="background:var(--bg-card); border:1px solid var(--border);">
+              <div class="stat-number" style="color:var(--success);">${historyApts.length}</div>
+              <div class="stat-label">Completed</div>
+            </div>
           </div>
-          <div class="stat-card" style="background:var(--bg-card); border:1px solid var(--border);">
-            <div class="stat-number" style="color:var(--warning);">${todayApts.length}</div>
-            <div class="stat-label">Accepted / Upcoming</div>
-          </div>
-          <div class="stat-card" style="background:var(--bg-card); border:1px solid var(--border);">
-            <div class="stat-number" style="color:var(--success);">${historyApts.length}</div>
-            <div class="stat-label">Completed</div>
-          </div>
+
+          <h2>Appointment Inbox (New)</h2>
+          ${newApts.length === 0 ? '<p style="color:var(--text-secondary); margin-bottom:var(--space-lg);">No new requests.</p>' : `
+            <div style="display:flex; flex-direction:column; gap:16px; margin-bottom:var(--space-2xl); margin-top:16px;">
+              ${newApts.map(a => `
+                <div class="card" style="border-left: 4px solid var(--info);">
+                  <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:16px;">
+                    <div>
+                      <h3 style="margin-bottom:4px;">${a.patientName}</h3>
+                      <div style="color:var(--text-secondary); font-size:14px; margin-bottom:8px;">📅 ${a.date} at ${a.time} • ${a.type.toUpperCase()}</div>
+                      <div style="font-size:14px;"><strong>Address:</strong> ${a.address}</div>
+                      <div style="font-size:14px; margin-top:4px;"><strong>Notes:</strong> ${a.notes || 'None'}</div>
+                    </div>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                      <button class="btn btn-secondary btn-sm" onclick="window.handleStatusUpdate('${a.id}', 'cancelled')">Decline</button>
+                      <button class="btn btn-primary btn-sm" onclick="window.handleStatusUpdate('${a.id}', 'accepted')">Accept</button>
+                    </div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          `}
+
+          <h2>Today's Schedule (Accepted)</h2>
+          ${todayApts.length === 0 ? '<p style="color:var(--text-secondary); margin-bottom:var(--space-lg);">No accepted appointments yet.</p>' : `
+            <div style="display:flex; flex-direction:column; gap:16px; margin-bottom:var(--space-2xl); margin-top:16px;">
+              ${todayApts.map(a => `
+                <div class="card" style="border-left: 4px solid var(--warning);">
+                  <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:16px;">
+                    <div>
+                      <h3 style="margin-bottom:4px;">${a.patientName}</h3>
+                      <div style="color:var(--text-secondary); font-size:14px; margin-bottom:8px;">📅 ${a.date} at ${a.time}</div>
+                      <div style="font-size:14px;"><strong>Address:</strong> ${a.address}</div>
+                    </div>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                      <a href="tel:${a.patientPhone}" class="btn btn-secondary btn-sm"><i data-lucide="phone" style="width:14px;height:14px;"></i> Call</a>
+                      <button class="btn btn-primary btn-sm" onclick="window.handleStatusUpdate('${a.id}', 'completed')"><i data-lucide="check-circle" style="width:14px;height:14px;"></i> Mark Completed</button>
+                    </div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          `}
         </div>
-
-        <h2>Appointment Inbox (New)</h2>
-        ${newApts.length === 0 ? '<p style="color:var(--text-secondary); margin-bottom:var(--space-lg);">No new requests.</p>' : `
-          <div style="display:flex; flex-direction:column; gap:16px; margin-bottom:var(--space-2xl); margin-top:16px;">
-            ${newApts.map(a => `
-              <div class="card" style="border-left: 4px solid var(--info);">
-                <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:16px;">
-                  <div>
-                    <h3 style="margin-bottom:4px;">${a.patientName}</h3>
-                    <div style="color:var(--text-secondary); font-size:14px; margin-bottom:8px;">📅 ${a.date} at ${a.time} • ${a.type.toUpperCase()}</div>
-                    <div style="font-size:14px;"><strong>Address:</strong> ${a.address}</div>
-                    <div style="font-size:14px; margin-top:4px;"><strong>Notes:</strong> ${a.notes || 'None'}</div>
-                  </div>
-                  <div style="display:flex; gap:8px; align-items:center;">
-                    <button class="btn btn-secondary btn-sm" onclick="window.handleStatusUpdate('${a.id}', 'cancelled')">Decline</button>
-                    <button class="btn btn-primary btn-sm" onclick="window.handleStatusUpdate('${a.id}', 'accepted')">Accept</button>
-                  </div>
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        `}
-
-        <h2>Today's Schedule (Accepted)</h2>
-        ${todayApts.length === 0 ? '<p style="color:var(--text-secondary); margin-bottom:var(--space-lg);">No accepted appointments yet.</p>' : `
-          <div style="display:flex; flex-direction:column; gap:16px; margin-bottom:var(--space-2xl); margin-top:16px;">
-            ${todayApts.map(a => `
-              <div class="card" style="border-left: 4px solid var(--warning);">
-                <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:16px;">
-                  <div>
-                    <h3 style="margin-bottom:4px;">${a.patientName}</h3>
-                    <div style="color:var(--text-secondary); font-size:14px; margin-bottom:8px;">📅 ${a.date} at ${a.time}</div>
-                    <div style="font-size:14px;"><strong>Address:</strong> ${a.address}</div>
-                  </div>
-                  <div style="display:flex; gap:8px; align-items:center;">
-                    <a href="tel:${a.patientPhone}" class="btn btn-secondary btn-sm"><i data-lucide="phone" style="width:14px;height:14px;"></i> Call</a>
-                    <button class="btn btn-primary btn-sm" onclick="window.handleStatusUpdate('${a.id}', 'completed')"><i data-lucide="check-circle" style="width:14px;height:14px;"></i> Mark Completed</button>
-                  </div>
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        `}
-      </div>
-    `;
-    if (window.lucide) lucide.createIcons();
+      `;
+      if (window.lucide) lucide.createIcons();
+    } catch (err) {
+      main.innerHTML = `<div class="container" style="padding:40px;"><p style="color:var(--danger);">${err.message}</p></div>`;
+    }
   });
 }
 
 function renderNurseDashboard() {
   const main = document.getElementById('main-content');
-  import('./utils/db.js').then(({ getAppointmentsForUser, updateAppointmentStatus, getCurrentUser }) => {
+  import('./utils/db.js').then(async ({ getAppointmentsForUser, updateAppointmentStatus, getCurrentUser }) => {
     const currentUser = getCurrentUser();
     if (!currentUser || currentUser.role !== 'nurse') { location.hash = '/login'; return; }
     
-    window.handleStatusUpdate = (aptId, status) => {
-      updateAppointmentStatus(aptId, status);
+    window.handleStatusUpdate = async (aptId, status) => {
+      await updateAppointmentStatus(aptId, status);
       renderNurseDashboard();
     };
 
-    const appointments = getAppointmentsForUser(currentUser.id, 'nurse');
-    const newApts = appointments.filter(a => a.status === 'new');
-    const activeApts = appointments.filter(a => a.status === 'accepted');
-    const historyApts = appointments.filter(a => a.status === 'completed' || a.status === 'cancelled');
-    
-    main.innerHTML = `
-      <div class="container" style="padding-top: var(--space-2xl); padding-bottom: var(--space-4xl);">
-        <h1 style="margin-bottom: var(--space-xl);">Nurse Dashboard: ${currentUser.name}</h1>
-        
-        <div class="grid grid-3" style="margin-bottom: var(--space-xl);">
-          <div class="stat-card" style="background:var(--bg-card); border:1px solid var(--border);">
-            <div class="stat-number" style="color:var(--info);">${newApts.length}</div>
-            <div class="stat-label">New Requests</div>
+    try {
+      const appointments = await getAppointmentsForUser(currentUser.id, 'nurse');
+      const newApts = appointments.filter(a => a.status === 'new');
+      const activeApts = appointments.filter(a => a.status === 'accepted');
+      const historyApts = appointments.filter(a => a.status === 'completed' || a.status === 'cancelled');
+      
+      main.innerHTML = `
+        <div class="container" style="padding-top: var(--space-2xl); padding-bottom: var(--space-4xl);">
+          <h1 style="margin-bottom: var(--space-xl);">Nurse Dashboard: ${currentUser.name}</h1>
+          
+          <div class="grid grid-3" style="margin-bottom: var(--space-xl);">
+            <div class="stat-card" style="background:var(--bg-card); border:1px solid var(--border);">
+              <div class="stat-number" style="color:var(--info);">${newApts.length}</div>
+              <div class="stat-label">New Requests</div>
+            </div>
+            <div class="stat-card" style="background:var(--bg-card); border:1px solid var(--border);">
+              <div class="stat-number" style="color:var(--warning);">${activeApts.length}</div>
+              <div class="stat-label">Active Bookings</div>
+            </div>
+            <div class="stat-card" style="background:var(--bg-card); border:1px solid var(--border);">
+              <div class="stat-number" style="color:var(--success);">${historyApts.length}</div>
+              <div class="stat-label">Completed</div>
+            </div>
           </div>
-          <div class="stat-card" style="background:var(--bg-card); border:1px solid var(--border);">
-            <div class="stat-number" style="color:var(--warning);">${activeApts.length}</div>
-            <div class="stat-label">Active Bookings</div>
-          </div>
-          <div class="stat-card" style="background:var(--bg-card); border:1px solid var(--border);">
-            <div class="stat-number" style="color:var(--success);">${historyApts.length}</div>
-            <div class="stat-label">Completed</div>
-          </div>
+
+          <h2>Booking Inbox (New)</h2>
+          ${newApts.length === 0 ? '<p style="color:var(--text-secondary); margin-bottom:var(--space-lg);">No new requests.</p>' : `
+            <div style="display:flex; flex-direction:column; gap:16px; margin-bottom:var(--space-2xl); margin-top:16px;">
+              ${newApts.map(a => `
+                <div class="card" style="border-left: 4px solid var(--info);">
+                  <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:16px;">
+                    <div>
+                      <h3 style="margin-bottom:4px;">${a.patientName}</h3>
+                      <div style="color:var(--text-secondary); font-size:14px; margin-bottom:8px;">📅 ${a.date} at ${a.time} • NURSING</div>
+                      <div style="font-size:14px;"><strong>Address:</strong> ${a.address}</div>
+                      <div style="font-size:14px; margin-top:4px;"><strong>Care Notes:</strong> ${a.notes || 'None'}</div>
+                    </div>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                      <button class="btn btn-secondary btn-sm" onclick="window.handleStatusUpdate('${a.id}', 'cancelled')">Decline</button>
+                      <button class="btn btn-primary btn-sm" onclick="window.handleStatusUpdate('${a.id}', 'accepted')">Accept</button>
+                    </div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          `}
+
+          <h2>Active Bookings</h2>
+          ${activeApts.length === 0 ? '<p style="color:var(--text-secondary); margin-bottom:var(--space-lg);">No active bookings yet.</p>' : `
+            <div style="display:flex; flex-direction:column; gap:16px; margin-bottom:var(--space-2xl); margin-top:16px;">
+              ${activeApts.map(a => `
+                <div class="card" style="border-left: 4px solid var(--warning);">
+                  <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:16px;">
+                    <div>
+                      <h3 style="margin-bottom:4px;">${a.patientName}</h3>
+                      <div style="color:var(--text-secondary); font-size:14px; margin-bottom:8px;">📅 ${a.date} at ${a.time}</div>
+                      <div style="font-size:14px;"><strong>Address:</strong> ${a.address}</div>
+                    </div>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                      <a href="tel:${a.patientPhone}" class="btn btn-secondary btn-sm"><i data-lucide="phone" style="width:14px;height:14px;"></i> Call</a>
+                      <button class="btn btn-primary btn-sm" onclick="window.handleStatusUpdate('${a.id}', 'completed')"><i data-lucide="check-circle" style="width:14px;height:14px;"></i> Mark Completed</button>
+                    </div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          `}
         </div>
-
-        <h2>Booking Inbox (New)</h2>
-        ${newApts.length === 0 ? '<p style="color:var(--text-secondary); margin-bottom:var(--space-lg);">No new requests.</p>' : `
-          <div style="display:flex; flex-direction:column; gap:16px; margin-bottom:var(--space-2xl); margin-top:16px;">
-            ${newApts.map(a => `
-              <div class="card" style="border-left: 4px solid var(--info);">
-                <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:16px;">
-                  <div>
-                    <h3 style="margin-bottom:4px;">${a.patientName}</h3>
-                    <div style="color:var(--text-secondary); font-size:14px; margin-bottom:8px;">📅 ${a.date} at ${a.time} • NURSING</div>
-                    <div style="font-size:14px;"><strong>Address:</strong> ${a.address}</div>
-                    <div style="font-size:14px; margin-top:4px;"><strong>Care Notes:</strong> ${a.notes || 'None'}</div>
-                  </div>
-                  <div style="display:flex; gap:8px; align-items:center;">
-                    <button class="btn btn-secondary btn-sm" onclick="window.handleStatusUpdate('${a.id}', 'cancelled')">Decline</button>
-                    <button class="btn btn-primary btn-sm" onclick="window.handleStatusUpdate('${a.id}', 'accepted')">Accept</button>
-                  </div>
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        `}
-
-        <h2>Active Bookings</h2>
-        ${activeApts.length === 0 ? '<p style="color:var(--text-secondary); margin-bottom:var(--space-lg);">No active bookings yet.</p>' : `
-          <div style="display:flex; flex-direction:column; gap:16px; margin-bottom:var(--space-2xl); margin-top:16px;">
-            ${activeApts.map(a => `
-              <div class="card" style="border-left: 4px solid var(--warning);">
-                <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:16px;">
-                  <div>
-                    <h3 style="margin-bottom:4px;">${a.patientName}</h3>
-                    <div style="color:var(--text-secondary); font-size:14px; margin-bottom:8px;">📅 ${a.date} at ${a.time}</div>
-                    <div style="font-size:14px;"><strong>Address:</strong> ${a.address}</div>
-                  </div>
-                  <div style="display:flex; gap:8px; align-items:center;">
-                    <a href="tel:${a.patientPhone}" class="btn btn-secondary btn-sm"><i data-lucide="phone" style="width:14px;height:14px;"></i> Call</a>
-                    <button class="btn btn-primary btn-sm" onclick="window.handleStatusUpdate('${a.id}', 'completed')"><i data-lucide="check-circle" style="width:14px;height:14px;"></i> Mark Completed</button>
-                  </div>
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        `}
-      </div>
-    `;
-    if (window.lucide) lucide.createIcons();
+      `;
+      if (window.lucide) lucide.createIcons();
+    } catch (err) {
+      main.innerHTML = `<div class="container" style="padding:40px;"><p style="color:var(--danger);">${err.message}</p></div>`;
+    }
   });
 }
 
