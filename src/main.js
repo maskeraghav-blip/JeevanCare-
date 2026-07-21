@@ -122,14 +122,35 @@ window.openBookingModal = (providerId, providerName, providerRole, type) => {
     return;
   }
   
+  const isHospital = type === 'hospital';
+  let hospital = null;
+  let hospitalDocs = [];
+  if (isHospital) {
+    hospital = (window.hospitals && window.hospitals.find(h => h.id === providerId)) || 
+               (window.clinics && window.clinics.find(c => c.id === providerId));
+    if (hospital && window.doctors) {
+      hospitalDocs = window.doctors.filter(d => d.hospital && d.hospital.toLowerCase().includes(hospital.name.toLowerCase().split(' ')[0]));
+    }
+  }
+
   const modal = document.getElementById('modal-overlay');
   modal.innerHTML = `
     <div class="modal-content card" style="max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; position: relative;">
       <button class="btn-close" onclick="document.getElementById('modal-overlay').classList.add('hidden')" style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 24px; cursor: pointer;">&times;</button>
-      <h2 style="margin-bottom: 16px;">Book ${type === 'nursing' ? 'Nurse' : 'Appointment'}</h2>
+      <h2 style="margin-bottom: 16px;">Book ${isHospital ? 'Hospital Visit' : type === 'nursing' ? 'Nurse' : 'Appointment'}</h2>
       <p style="margin-bottom: 24px; color: var(--text-secondary);">Booking with <strong>${providerName}</strong></p>
       
       <form id="booking-form" style="display: flex; flex-direction: column; gap: 16px;">
+        <div style="display: flex; gap: 16px;">
+          <div style="flex: 1;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Patient Name</label>
+            <input type="text" id="b-name" required value="${user.name}" style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border);" />
+          </div>
+          <div style="flex: 1;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Contact Number</label>
+            <input type="tel" id="b-phone" required value="${user.phone || ''}" style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border);" />
+          </div>
+        </div>
         <div>
           <label style="display: block; margin-bottom: 8px; font-weight: 500;">Date</label>
           <input type="date" id="b-date" required style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border);" />
@@ -138,10 +159,27 @@ window.openBookingModal = (providerId, providerName, providerRole, type) => {
           <label style="display: block; margin-bottom: 8px; font-weight: 500;">Time</label>
           <input type="time" id="b-time" required style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border);" />
         </div>
-        <div>
-          <label style="display: block; margin-bottom: 8px; font-weight: 500;">Address</label>
-          <input type="text" id="b-address" required placeholder="Enter your full address" style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border);" />
-        </div>
+        ${isHospital ? `
+          <div>
+            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Department</label>
+            <select id="b-dept" required style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border);">
+              <option value="">Select Department</option>
+              ${hospital && hospital.specialties ? hospital.specialties.map(s => `<option value="${s}">${s}</option>`).join('') : '<option value="General">General</option>'}
+            </select>
+          </div>
+          <div>
+            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Doctor (Optional)</label>
+            <select id="b-doc" style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border);">
+              <option value="">Any Available Doctor</option>
+              ${hospitalDocs.map(d => `<option value="${d.id}">${d.name} - ${d.specialty}</option>`).join('')}
+            </select>
+          </div>
+        ` : `
+          <div>
+            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Address</label>
+            <input type="text" id="b-address" required placeholder="Enter your full address" style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border);" />
+          </div>
+        `}
         <div>
           <label style="display: block; margin-bottom: 8px; font-weight: 500;">Reason / Notes</label>
           <textarea id="b-notes" rows="3" placeholder="Any specific requirements or symptoms?" style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border);"></textarea>
@@ -156,21 +194,34 @@ window.openBookingModal = (providerId, providerName, providerRole, type) => {
   document.getElementById('booking-form').addEventListener('submit', (e) => {
     e.preventDefault();
     import('./utils/db.js').then(({ createAppointment }) => {
+      let notesText = document.getElementById('b-notes').value;
+      if (isHospital) {
+         const dept = document.getElementById('b-dept').value;
+         const docSel = document.getElementById('b-doc');
+         const docText = docSel.options[docSel.selectedIndex].text;
+         notesText = \`Dept: \${dept} | Doc: \${docText} | \${notesText}\`;
+      }
+
       createAppointment({
         patientId: user.id,
-        patientName: user.name,
-        patientPhone: user.phone,
+        patientName: document.getElementById('b-name').value,
+        patientPhone: document.getElementById('b-phone').value,
         providerId: providerId,
         providerName: providerName,
         providerRole: providerRole,
         type: type,
         date: document.getElementById('b-date').value,
         time: document.getElementById('b-time').value,
-        address: document.getElementById('b-address').value,
-        notes: document.getElementById('b-notes').value
+        address: isHospital ? 'In-person Hospital Visit' : document.getElementById('b-address').value,
+        notes: notesText,
+        status: isHospital ? 'pending' : 'new'
       });
       modal.classList.add('hidden');
-      alert('Booking confirmed! It is now pending provider acceptance.');
+      if (isHospital) {
+        alert('Your request has been sent. Please call the hospital to confirm your slot.');
+      } else {
+        alert('Booking confirmed! It is now pending provider acceptance.');
+      }
       location.hash = '/patient-dashboard';
     });
   });
@@ -973,7 +1024,10 @@ function renderHospitalProfile(id) {
             </div>
             <div style="text-align:right;">
               <div style="font-size:24px;font-weight:bold;color:var(--warning);">★ ${hospital.rating}</div>
-              <a class="btn btn-primary btn-sm" href="${getDirectionsUrl(hospital.lat, hospital.lng)}" target="_blank" style="margin-top:12px;"><i data-lucide="navigation" style="width:16px;"></i> Get Directions</a>
+              <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top:12px;">
+                <a class="btn btn-secondary btn-sm" href="${getDirectionsUrl(hospital.lat, hospital.lng)}" target="_blank"><i data-lucide="navigation" style="width:16px;"></i> Directions</a>
+                <button class="btn btn-primary btn-sm" onclick="window.openBookingModal('${hospital.id}', '${hospital.name.replace(/'/g, "\\'")}', 'hospital', 'hospital')"><i data-lucide="calendar" style="width:16px;"></i> Book Appointment</button>
+              </div>
             </div>
           </div>
           <div style="margin-top:24px;padding-top:24px;border-top:1px solid var(--border);">
@@ -1204,7 +1258,7 @@ function renderPatientDashboard() {
                 <div>
                   <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
                     <span class="badge" style="background:var(--surface-active);">${a.type.toUpperCase()}</span>
-                    <span style="font-weight:600; color:${a.status === 'new' ? 'var(--info)' : a.status === 'accepted' ? 'var(--warning)' : a.status === 'completed' ? 'var(--success)' : 'var(--danger)'}; text-transform:uppercase; font-size:12px;">${a.status}</span>
+                    <span style="font-weight:600; color:${(a.status === 'new' || a.status === 'pending') ? 'var(--info)' : a.status === 'accepted' ? 'var(--warning)' : a.status === 'completed' ? 'var(--success)' : 'var(--danger)'}; text-transform:uppercase; font-size:12px;">${a.status}</span>
                   </div>
                   <h3 style="margin-bottom:4px;">${a.providerName}</h3>
                   <div style="color:var(--text-secondary); font-size:14px;">📅 ${a.date} at ${a.time}</div>
