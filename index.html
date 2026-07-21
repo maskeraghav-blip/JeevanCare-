@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JeevanCare+ | AI-Powered Healthcare & Home Doctor Platform</title>
+  <meta name="description" content="JeevanCare+ — Find hospitals, doctors, clinics near you. AI-powered symptom checker, home doctor service, emergency support. Healthcare made simple for everyone." />
+  <meta name="keywords" content="healthcare, hospital finder, doctor booking, AI health, home doctor, Hyderabad hospitals, clinic finder" />
+  <meta property="og:title" content="JeevanCare+ | AI-Powered Healthcare Platform" />
+  <meta property="og:description" content="Find hospitals, doctors & clinics near you. AI symptom checker, home doctor service & emergency support." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#0A1628" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+  <!-- Leaflet MarkerCluster -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <!-- App Styles -->
+  <link rel="stylesheet" href="/src/styles/index.css" />
+  <link rel="stylesheet" href="/src/styles/components.css" />
+  <link rel="stylesheet" href="/src/styles/pages.css" />
+  <link rel="stylesheet" href="/src/styles/animations.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Navbar -->
+    <nav id="navbar"></nav>
+
+    <!-- Main Content -->
+    <main id="main-content"></main>
+
+    <!-- Footer -->
+    <footer id="footer"></footer>
+
+    <!-- Modal Overlay -->
+    <div id="modal-overlay" class="modal-overlay hidden"></div>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+      <div class="loader-container">
+        <div class="heartbeat-loader">
+          <svg viewBox="0 0 150 40" class="heartbeat-svg">
+            <polyline points="0,20 30,20 35,5 40,35 45,15 50,25 55,20 150,20" fill="none" stroke="var(--accent)" stroke-width="2.5" />
+          </svg>
+        </div>
+        <p class="loader-text">JeevanCare<span class="accent">+</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- App Entry -->
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
