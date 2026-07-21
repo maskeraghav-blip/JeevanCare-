@@ -199,7 +199,7 @@ window.openBookingModal = (providerId, providerName, providerRole, type) => {
          const dept = document.getElementById('b-dept').value;
          const docSel = document.getElementById('b-doc');
          const docText = docSel.options[docSel.selectedIndex].text;
-         notesText = \`Dept: \${dept} | Doc: \${docText} | \${notesText}\`;
+         notesText = `Dept: ${dept} | Doc: ${docText} | ${notesText}`;
       }
 
       createAppointment({
