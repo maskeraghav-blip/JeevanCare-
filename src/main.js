@@ -3,20 +3,20 @@
    ============================================ */
 
 import { Router } from './utils/router.js';
-import { hospitals, areas, searchHospitals } from './data/hospitals.js';
-import { doctors, searchDoctors, getDoctorsBySpecialty } from './data/doctors.js';
-import { clinics, searchClinics } from './data/clinics.js';
 import { specialtyData, findSpecialtyFromSymptoms, getSelfCareTips } from './data/specialties.js';
 import { additionalServices, careProgrammes, targetUsers } from './data/services.js';
-import { nurses } from './data/nurses.js';
 import {
   debounce, starRating, getInitials, animateCounter,
   initScrollReveal, toggleTheme, loadTheme, getDirectionsUrl,
   getUserLocation, calculateDistance, formatDistance,
   toggleFavorite, isFavorite
 } from './utils/helpers.js';
-import { initDB, getCurrentUser, logout } from './utils/db.js';
+import { 
+  initDB, getCurrentUser, logout, 
+  getHospitals, getClinics, getDoctors, getNurses 
+} from './utils/db.js';
 
+await loadPublicData();
 initDB();
 
 // ===== Initialize App =====

@@ -94,3 +94,53 @@ export async function updateAppointmentStatus(appointmentId, status) {
 export async function getAppointmentsForUser(userId, role) {
   return await fetchWithAuth('/appointments');
 }
+
+// Public Data methods
+export async function getHospitals() {
+  const res = await fetch(`${API_BASE}/public/hospitals`);
+  return await res.json();
+}
+
+export async function getClinics() {
+  const res = await fetch(`${API_BASE}/public/clinics`);
+  return await res.json();
+}
+
+export async function getDoctors() {
+  const res = await fetch(`${API_BASE}/public/doctors`);
+  return await res.json();
+}
+
+export async function getNurses() {
+  const res = await fetch(`${API_BASE}/public/nurses`);
+  return await res.json();
+}
+
+export let hospitals = [];
+export let doctors = [];
+export let clinics = [];
+export let nurses = [];
+export let areas = [];
+
+export const searchHospitals = (q) => hospitals.filter(h => h.name.toLowerCase().includes(q.toLowerCase()) || (h.area && h.area.toLowerCase().includes(q.toLowerCase())));
+export const searchDoctors = (q) => doctors.filter(d => d.name.toLowerCase().includes(q.toLowerCase()) || (d.specialty && d.specialty.toLowerCase().includes(q.toLowerCase())));
+export const getDoctorsBySpecialty = (s) => doctors.filter(d => d.specialty === s);
+export const searchClinics = (q) => clinics.filter(c => c.name.toLowerCase().includes(q.toLowerCase()) || (c.area && c.area.toLowerCase().includes(q.toLowerCase())));
+
+export async function loadPublicData() {
+  try {
+    hospitals = await getHospitals();
+    doctors = await getDoctors();
+    clinics = await getClinics();
+    nurses = await getNurses();
+    areas = [...new Set(hospitals.map(h => h.area || h.location || ''))].filter(Boolean);
+    
+    // Attach to window for openBookingModal legacy support
+    window.hospitals = hospitals;
+    window.doctors = doctors;
+    window.clinics = clinics;
+    window.nurses = nurses;
+  } catch (err) {
+    console.error("Failed to load public data", err);
+  }
+}
